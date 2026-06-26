@@ -251,8 +251,8 @@ jobs:
           {
             echo "## JSON 质量门禁"
             echo ""
-            echo "| 文件 | 检查结果 | DeepSeek Token |"
-            echo "|------|---------|---------------|"
+            echo "| 文件 | 检查结果 | Token 消耗 | 费用 |"
+            echo "|------|---------|-----------|------|"
             python3 -c "
           import json
           with open('/tmp/deterministic_results.json') as f:
@@ -263,6 +263,8 @@ jobs:
                   ai = json.load(f)
               ai_avail = not ai.get('error')
           except: pass
+          total_cost = 0
+          total_tokens = 0
           for path, info in sorted(det.get('files', {}).items()):
               name = path.split('/')[-1][:55]
               issues = info.get('issues', [])
@@ -274,15 +276,23 @@ jobs:
               elif notices: status = f'ℹ️ {notices}N'
               else: status = '✅ 通过'
               token_str = '-'
+              cost_str = '-'
               if ai_avail:
                   ai_info = ai.get('files', {}).get(path, {})
                   meta = ai_info.get('_meta', {})
                   usage = meta.get('actual_usage', {})
-                  total = usage.get('total_tokens', '?')
+                  tok = usage.get('total_tokens', 0)
                   reasoning = usage.get('reasoning_tokens', 0)
-                  token_str = f'合计 {total}'
-                  if reasoning: token_str += f' (推理 {reasoning})'
-              print(f'| {name} | {status} | {token_str} |')
+                  cost = usage.get('cost_total', 0)
+                  if tok:
+                      token_str = f'{tok}'
+                      if reasoning: token_str += f' (推理{reasoning})'
+                      cost_str = f'¥{cost:.4f}'
+                      total_cost += cost
+                      total_tokens += tok
+              print(f'| {name} | {status} | {token_str} | {cost_str} |')
+          if total_cost > 0:
+              print(f'| **合计** | | **{total_tokens}** | **¥{total_cost:.4f}** |')
           " 2>/dev/null || echo "| - | 结果解析失败 | - |"
             echo ""
             echo "---"

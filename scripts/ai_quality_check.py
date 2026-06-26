@@ -384,13 +384,44 @@ def call_deepseek(system: str, user: str, api_key: str,
         )
 
         # Extract token usage for cost monitoring
+        # DeepSeek pricing (CNY per 1M tokens):
+        #   Input  (cache miss): ¥3   Input  (cache hit): ¥0.025   Output: ¥6
+        PRICE_INPUT_CACHE_MISS = 3.0
+        PRICE_INPUT_CACHE_HIT  = 0.025
+        PRICE_OUTPUT           = 6.0
+
         usage = {}
+        cost_input = 0.0
+        cost_output = 0.0
+        cached_tokens = 0
+        uncached_tokens = 0
+
         if hasattr(response, 'usage') and response.usage:
+            prompt_tokens = getattr(response.usage, 'prompt_tokens', 0)
+            completion_tokens = getattr(response.usage, 'completion_tokens', 0)
+            total_tokens = getattr(response.usage, 'total_tokens', 0)
+
             usage = {
-                "prompt_tokens": getattr(response.usage, 'prompt_tokens', 0),
-                "completion_tokens": getattr(response.usage, 'completion_tokens', 0),
-                "total_tokens": getattr(response.usage, 'total_tokens', 0),
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
             }
+
+            # Check for cache hit tokens (DeepSeek may report via prompt_tokens_details)
+            if hasattr(response.usage, 'prompt_tokens_details') and response.usage.prompt_tokens_details:
+                cached_tokens = getattr(response.usage.prompt_tokens_details, 'cached_tokens', 0)
+            uncached_tokens = prompt_tokens - cached_tokens
+
+            # Calculate cost
+            cost_input = (uncached_tokens / 1_000_000) * PRICE_INPUT_CACHE_MISS + \
+                         (cached_tokens / 1_000_000) * PRICE_INPUT_CACHE_HIT
+            cost_output = (completion_tokens / 1_000_000) * PRICE_OUTPUT
+
+            usage["cached_tokens"] = cached_tokens
+            usage["cost_input"] = round(cost_input, 6)
+            usage["cost_output"] = round(cost_output, 6)
+            usage["cost_total"] = round(cost_input + cost_output, 6)
+
             # DeepSeek thinking model: reasoning tokens
             if hasattr(response.usage, 'completion_tokens_details') and response.usage.completion_tokens_details:
                 usage["reasoning_tokens"] = getattr(
@@ -419,12 +450,15 @@ def call_deepseek(system: str, user: str, api_key: str,
         result = json.loads(text)
         result["_usage"] = usage
 
-        # Log token usage to stderr for CI visibility
+        # Log token usage and cost to stderr for CI visibility
         reasoning_info = f", 推理={usage.get('reasoning_tokens', 0)}" if 'reasoning_tokens' in usage else ""
+        cache_info = f", 缓存命中={cached_tokens}" if cached_tokens > 0 else ""
+        cost_total = usage.get('cost_total', 0)
         import sys as _sys
-        print(f"[DeepSeek Token] 输入={usage.get('prompt_tokens', '?')}, "
+        print(f"[DeepSeek] 输入={usage.get('prompt_tokens', '?')}, "
               f"输出={usage.get('completion_tokens', '?')}, "
-              f"合计={usage.get('total_tokens', '?')}{reasoning_info}",
+              f"合计={usage.get('total_tokens', '?')}{reasoning_info}{cache_info} | "
+              f"费用=¥{cost_total:.4f}",
               file=_sys.stderr)
 
         return result
