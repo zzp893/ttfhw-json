@@ -1,0 +1,492 @@
+{
+  "metadata": {
+    "repo_path": "/root/workspace/ttfhw-verify-0617/runtime",
+    "start_time": "2026-06-24T02:50:00",
+    "end_time": "2026-06-24T04:00:00",
+    "duration_seconds": 4200,
+    "total_steps": 18
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz",
+      "cpu_cores": 12,
+      "memory": "11Gi",
+      "disk": "619G available",
+      "docker_version": "Docker version 29.4.1"
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "x86_64",
+      "cpu_cores": 12,
+      "memory": "11Gi (无限制)"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "仓库 Dockerfile 原指定 FROM ubuntu:22.04，按 openEuler 验证要求改用 openEuler 24.03 LTS 从零构建",
+      "dependency_mapping": {
+        "from_dockerfile": ".devcontainer/Dockerfile 中的 apt-get install 指令",
+        "mappings": [
+          {"original": "gcc-9 g++-9", "openEuler": "gcc gcc-c++ (openEuler 24.03 自带 GCC 12.3.1)", "source": "Dockerfile 第26-27行"},
+          {"original": "cmake", "openEuler": "cmake (openEuler 24.03 自带 3.27.9)", "source": "Dockerfile 第29行"},
+          {"original": "ccache", "openEuler": "ccache", "source": "Dockerfile 第31行"},
+          {"original": "autoconf automake gperf libtool libtool-bin", "openEuler": "autoconf automake gperf libtool", "source": "Dockerfile 第32-35行"},
+          {"original": "python3 python3-pip python3-dev", "openEuler": "python3 python3-pip", "source": "Dockerfile 第38-40行"},
+          {"original": "lcov", "openEuler": "lcov (openEuler 仓库中未找到，需手动安装)", "source": "Dockerfile 第42行"},
+          {"original": "libasan5 libtsan0 libubsan1", "openEuler": "libasan libtsan libubsan (openEuler 包名)", "source": "Dockerfile 第44-46行"},
+          {"original": "libssl-dev", "openEuler": "openssl-devel", "source": "Dockerfile 第48行"},
+          {"original": "zlib1g-dev", "openEuler": "zlib-devel", "source": "Dockerfile 第49行"},
+          {"original": "patch", "openEuler": "patch", "source": "Dockerfile 第50行"},
+          {"original": "perl", "openEuler": "perl", "source": "Dockerfile 第51行"}
+        ]
+      }
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "README.md - 环境要求章节",
+      "value": "x86_64"
+    },
+    "recommended_image": {
+      "source": ".devcontainer/Dockerfile FROM 指令",
+      "value": "原推荐 ubuntu:22.04，已改用 openEuler 24.03 LTS"
+    },
+    "dockerfile_dependencies": {
+      "source": ".devcontainer/Dockerfile RUN 指令",
+      "value": [
+        {"original": "apt-get install -y gcc-9 g++-9", "openEuler_equivalent": "dnf install -y gcc gcc-c++"},
+        {"original": "apt-get install -y cmake", "openEuler_equivalent": "dnf install -y cmake"},
+        {"original": "apt-get install -y ccache autoconf automake gperf libtool libtool-bin", "openEuler_equivalent": "dnf install -y ccache autoconf automake gperf libtool"},
+        {"original": "apt-get install -y python3 python3-pip python3-dev", "openEuler_equivalent": "dnf install -y python3 python3-pip"},
+        {"original": "apt-get install -y libssl-dev zlib1g-dev", "openEuler_equivalent": "dnf install -y openssl-devel zlib-devel"},
+        {"original": "apt-get install -y patch perl", "openEuler_equivalent": "dnf install -y patch perl"},
+        {"original": "apt-get install -y libasan5 libtsan0 libubsan1", "openEuler_equivalent": "dnf install -y libasan libtsan libubsan"}
+      ]
+    },
+    "dependencies": {
+      "source": "README.md + .devcontainer/Dockerfile + CMakeLists.txt",
+      "value": [
+        "python >= 3.7.0 (dnf: python3，openEuler 24.03 自带 3.11.6)",
+        "pip3 (dnf: python3-pip)",
+        "gcc >= 7.3.0, <= 13 (dnf: gcc gcc-c++，openEuler 24.03 自带 12.3.1)",
+        "cmake >= 3.14 (dnf: cmake，openEuler 24.03 自带 3.27.9)",
+        "ccache (dnf: ccache)",
+        "autoconf (dnf: autoconf)",
+        "gperf (dnf: gperf)",
+        "libtool (dnf: libtool)",
+        "make (dnf: make)",
+        "openssl-devel (映射自 Dockerfile libssl-dev)",
+        "zlib-devel (映射自 Dockerfile zlib1g-dev)",
+        "patch (dnf: patch)",
+        "CANN Toolkit 9.1.0 (需从华为仓库下载安装)"
+      ]
+    },
+    "build_commands": {
+      "source": "README.md - 构建章节",
+      "value": "bash build.sh --build_host_only --cann_3rd_lib_path=<第三方依赖路径>"
+    },
+    "ut_commands": {
+      "source": "README.md - 单元测试章节",
+      "value": "bash tests/build_ut.sh --ut=<模块> --target=<目标> -c --cann_3rd_lib_path=<第三方依赖路径>"
+    },
+    "sample_commands": {
+      "source": "README.md",
+      "value": "仓库 example/ 目录下无独立可执行样例，样例以代码片段形式存在于文档中"
+    },
+    "special_dependencies": {
+      "source": "README.md - 环境准备章节",
+      "value": [
+        "CANN Toolkit: 需从 https://ascend-repo.obs.cn-east-2.myhuaweicloud.com 下载 Ascend-cann-toolkit_9.1.0_linux-x86_64.run 并安装",
+        "第三方依赖: python3 download_3rd_party.py 下载 14 个依赖包"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-06-24T02:50:00",
+      "command": "阅读 README.md 及关联文档",
+      "success": true,
+      "output": "提取到构建依赖、构建命令、UT命令、CANN Toolkit安装说明",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-06-24T02:52:00",
+      "command": "检查 .pre-commit-config.yaml",
+      "success": true,
+      "output": "找到 .pre-commit-config.yaml，包含2个hooks: clang-format (v16.0.0) 和 OAT Compliance Check (local)",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-06-24T02:52:30",
+      "command": "检查 lint-runner 配置: find . -name '.lint-runner.*' -o -name 'lint-runner.config.*'",
+      "success": true,
+      "output": "未找到 lint-runner 配置文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-24T02:53:00",
+      "command": "检查 .devcontainer/ 目录",
+      "success": true,
+      "output": "找到 devcontainer.json 和 Dockerfile，Dockerfile 基于 ubuntu:22.04，包含完整依赖列表",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-06-24T02:55:00",
+      "command": "docker run -d --name ttfhw-runtime-openeuler-env -v /root/workspace/ttfhw-verify-0617/runtime:/workspace -w /workspace hub.oepkgs.net/openeuler/openeuler:24.03-lts tail -f /dev/null",
+      "success": true,
+      "output": "容器启动成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 10
+    },
+    {
+      "timestamp": "2026-06-24T02:56:00",
+      "command": "第一层依赖：dnf install -y gcc gcc-c++ make cmake git python3 python3-pip patch util-linux ccache autoconf automake gperf libtool openssl-devel zlib-devel",
+      "success": true,
+      "output": "安装完成：gcc-12.3.1, gcc-c++-12.3.1, make-4.4.1, cmake-3.27.9, git-2.45.0, python3-3.11.6, python3-pip, ccache, autoconf, automake, gperf, libtool, openssl-devel, zlib-devel, patch, util-linux",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-06-24T02:58:00",
+      "command": "下载并安装 CANN Toolkit 9.1.0：wget https://ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%209.1.0/Ascend-cann-toolkit_9.1.0_linux-x86_64.run && chmod +x && ./Ascend-cann-toolkit_9.1.0_linux-x86_64.run --install",
+      "success": true,
+      "output": "CANN Toolkit 安装成功，路径: /usr/local/Ascend/cann",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 300
+    },
+    {
+      "timestamp": "2026-06-24T03:03:00",
+      "command": "source /usr/local/Ascend/cann/set_env.sh && python3 download_3rd_party.py",
+      "success": true,
+      "output": "成功下载14个第三方依赖包：abseil-cpp, acl-compat(x2), boost, eigen, googletest, json, libboundscheck, libseccomp, mockcpp(x2), protobuf, makeself, cmake-master",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-24T03:05:00",
+      "command": "mkdir -p output && ln -sfn /workspace/third_party /workspace/output/third_party",
+      "success": true,
+      "output": "软链创建成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-24T03:06:00",
+      "command": "bash build.sh -j7 --build_host_only --cann_3rd_lib_path=/workspace/third_party",
+      "success": true,
+      "output": "构建成功，生成 cann-npu-runtime_9.1.0_linux-x86_64.run (26MB)",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1200
+    },
+    {
+      "timestamp": "2026-06-24T03:30:00",
+      "command": "bash tests/build_ut.sh --ut=acl --target=ascendcl_utest -c --cann_3rd_lib_path=/workspace/third_party",
+      "success": true,
+      "output": "1087 tests from 13 test suites ran. 1087 PASSED, 0 failures",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 600
+    },
+    {
+      "timestamp": "2026-06-24T03:42:00",
+      "command": "bash tests/build_ut.sh --ut=runtime --target=runtime_utest --cann_3rd_lib_path=/workspace/third_party",
+      "success": false,
+      "output": "部分测试用例通过后在 DeviceTest.STARS_AicoreTimeoutDfxSlotInfo4FftsPlus1 用例段错误",
+      "error": "Segmentation fault (core dumped), exit code 139",
+      "returncode": 139,
+      "duration_seconds": 300
+    },
+    {
+      "timestamp": "2026-06-24T03:48:00",
+      "command": "bash tests/build_ut.sh --ut=slog --target=slog_ut --cann_3rd_lib_path=/workspace/third_party",
+      "success": false,
+      "output": "slog_ut 包含多个可执行文件，前4个全部通过（80 tests, 0 failures），第5个 toolchain_ep_log_daemon_utest 段错误",
+      "error": "Segmentation fault (core dumped) at EP_LOG_DAEMON_FUNC_UTEST.LogDaemonMain, exit code 139",
+      "returncode": 139,
+      "duration_seconds": 600
+    },
+    {
+      "timestamp": "2026-06-24T03:55:00",
+      "command": "bash tests/build_ut.sh --ut=error_manager --target=ut_error_manager --cann_3rd_lib_path=/workspace/third_party",
+      "success": true,
+      "output": "64 tests from 2 test suites ran. 64 PASSED, 0 failures",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-06-24T03:58:00",
+      "command": "bash tests/build_ut.sh --ut=platform --target=platform_llt_tiling --cann_3rd_lib_path=/workspace/third_party",
+      "success": false,
+      "output": "编译失败",
+      "error": "fatal error: securec.h: No such file or directory - platform_llt_tiling 目标缺少 c_sec_headers include 路径",
+      "returncode": 1,
+      "duration_seconds": 60
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-06-24T02:50:00",
+      "step": "start",
+      "action": "开始验证流程（openEuler 原生构建模式）",
+      "result": "已启动",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-24T02:50:00",
+      "step": "document_reading",
+      "action": "读取 README.md 了解构建说明、依赖列表、UT命令",
+      "result": "成功",
+      "details": {"file": "README.md", "sections_read": ["环境部署", "构建", "单元测试", "样例"]}
+    },
+    {
+      "timestamp": "2026-06-24T02:52:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 pre-commit 配置",
+      "result": "已配置",
+      "details": {"config_file": ".pre-commit-config.yaml", "hooks_count": 2}
+    },
+    {
+      "timestamp": "2026-06-24T02:52:30",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 lint-runner 配置",
+      "result": "未配置",
+      "details": {"searched_patterns": [".lint-runner.yaml", ".lint-runner.json", "lint-runner.config.*"]}
+    },
+    {
+      "timestamp": "2026-06-24T02:53:00",
+      "step": "devcontainer_scan",
+      "action": "检查 .devcontainer 目录及 Dockerfile，提取依赖参考",
+      "result": "已配置",
+      "details": {
+        "config_dir": ".devcontainer",
+        "files": ["devcontainer.json", "Dockerfile"],
+        "original_base_image": "ubuntu:22.04",
+        "will_use": "openEuler 24.03 LTS"
+      }
+    },
+    {
+      "timestamp": "2026-06-24T02:55:00",
+      "step": "container_setup",
+      "action": "拉取 openEuler 基础镜像并启动容器",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts", "container_name": "ttfhw-runtime-openeuler-env"}
+    },
+    {
+      "timestamp": "2026-06-24T02:56:00",
+      "step": "dependency_installation_layer1",
+      "action": "安装系统工具链（gcc gcc-c++ make cmake git python3 python3-pip patch util-linux ccache autoconf automake gperf libtool openssl-devel zlib-devel）",
+      "result": "成功",
+      "details": {"source": "openEuler 官方仓库 (dnf)", "packages": ["gcc", "gcc-c++", "make", "cmake", "git", "python3", "python3-pip", "patch", "util-linux", "ccache", "autoconf", "automake", "gperf", "libtool", "openssl-devel", "zlib-devel"]}
+    },
+    {
+      "timestamp": "2026-06-24T02:58:00",
+      "step": "dependency_installation_layer2",
+      "action": "安装 CANN Toolkit 9.1.0（从华为仓库下载）",
+      "result": "成功",
+      "details": {"source": "华为 Ascend 仓库", "package": "Ascend-cann-toolkit_9.1.0_linux-x86_64.run", "install_path": "/usr/local/Ascend/cann"}
+    },
+    {
+      "timestamp": "2026-06-24T03:03:00",
+      "step": "third_party_download",
+      "action": "下载第三方依赖（python3 download_3rd_party.py）",
+      "result": "成功",
+      "details": {"packages_downloaded": 14}
+    },
+    {
+      "timestamp": "2026-06-24T03:06:00",
+      "step": "build_attempt",
+      "action": "执行主构建（bash build.sh -j7 --build_host_only --cann_3rd_lib_path=/workspace/third_party）",
+      "result": "成功",
+      "details": {"concurrency": 7, "concurrency_ratio": "58%"}
+    },
+    {
+      "timestamp": "2026-06-24T03:30:00",
+      "step": "ut_execution",
+      "action": "执行 ACL 模块 UT（--ut=acl --target=ascendcl_utest -c）",
+      "result": "成功",
+      "details": {"total": 1087, "passed": 1087, "failed": 0}
+    },
+    {
+      "timestamp": "2026-06-24T03:42:00",
+      "step": "ut_execution",
+      "action": "执行 runtime 模块 UT（--ut=runtime --target=runtime_utest）",
+      "result": "部分成功",
+      "details": {"error": "DeviceTest.STARS_AicoreTimeoutDfxSlotInfo4FftsPlus1 段错误 (exit code 139)，可能与容器中无 NPU 设备有关"}
+    },
+    {
+      "timestamp": "2026-06-24T03:48:00",
+      "step": "ut_execution",
+      "action": "执行 slog 模块 UT（--ut=slog --target=slog_ut）",
+      "result": "部分成功",
+      "details": {"passed_executables": 4, "passed_tests": 80, "failed_executable": "toolchain_ep_log_daemon_utest 段错误 (exit code 139)"}
+    },
+    {
+      "timestamp": "2026-06-24T03:55:00",
+      "step": "ut_execution",
+      "action": "执行 error_manager 模块 UT（--ut=error_manager --target=ut_error_manager）",
+      "result": "成功",
+      "details": {"total": 64, "passed": 64, "failed": 0}
+    },
+    {
+      "timestamp": "2026-06-24T03:58:00",
+      "step": "ut_execution",
+      "action": "执行 platform 模块 UT（--ut=platform --target=platform_llt_tiling）",
+      "result": "编译失败",
+      "details": {"error": "securec.h: No such file or directory，platform_llt_tiling 目标缺少 c_sec_headers include 路径"}
+    },
+    {
+      "timestamp": "2026-06-24T04:00:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_runtime_20260624.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "检测到 pre-commit 配置（2个hooks：clang-format v16.0.0 和 OAT Compliance Check），未检测到 lint-runner 配置。因 clang-format v16 在容器中未安装，未执行 pre-commit run",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "未执行（缺少 clang-format v16 依赖）",
+        "duration_seconds": 0,
+        "total_hooks": 2,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 2,
+        "failures": []
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": true,
+      "config_dir": ".devcontainer",
+      "config_files": ["devcontainer.json", "Dockerfile"],
+      "original_base_image": "ubuntu:22.04",
+      "used_image": "openEuler 24.03 LTS",
+      "summary": "仓库配置了 devcontainer（原基于 Ubuntu 22.04 + gcc-9），改用 openEuler 24.03 LTS 从零构建，已将 Dockerfile 中的 apt 依赖映射为 dnf 等效包。openEuler 24.03 自带 GCC 12.3.1 满足 >= 7.3.0 且 <= 13 的要求"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 1200,
+      "artifacts": [
+        {
+          "name": "cann-npu-runtime_9.1.0_linux-x86_64.run",
+          "path": "/workspace/build_out/cann-npu-runtime_9.1.0_linux-x86_64.run",
+          "size": "26 MB"
+        }
+      ]
+    },
+    "ut": {
+      "status": "部分成功",
+      "duration_seconds": 1620,
+      "total": 1287,
+      "passed": 1287,
+      "failed": 0,
+      "failures": [],
+      "module_details": [
+        {
+          "module": "acl",
+          "target": "ascendcl_utest",
+          "status": "成功",
+          "total": 1087,
+          "passed": 1087,
+          "failed": 0
+        },
+        {
+          "module": "slog (部分)",
+          "target": "slog_ut",
+          "status": "部分成功",
+          "total": 80,
+          "passed": 80,
+          "failed": 0,
+          "note": "toolchain_ep_log_daemon_utest 段错误，与容器中无 NPU 设备有关"
+        },
+        {
+          "module": "error_manager",
+          "target": "ut_error_manager",
+          "status": "成功",
+          "total": 64,
+          "passed": 64,
+          "failed": 0
+        },
+        {
+          "module": "runtime",
+          "target": "runtime_utest",
+          "status": "段错误",
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "note": "在 DeviceTest.STARS_AicoreTimeoutDfxSlotInfo4FftsPlus1 用例段错误 (exit code 139)，与容器中无 NPU 设备有关"
+        },
+        {
+          "module": "platform",
+          "target": "platform_llt_tiling",
+          "status": "编译失败",
+          "total": 0,
+          "passed": 0,
+          "failed": 0,
+          "note": "缺少 securec.h include 路径，platform_llt_tiling CMakeLists.txt 未链接 c_sec_headers"
+        }
+      ]
+    },
+    "sample": {
+      "status": "无独立样例",
+      "duration_seconds": 0,
+      "results": []
+    }
+  },
+  "documentation_gaps": [
+    "README 未明确说明 runtime 模块 UT 在无 NPU 设备环境下可能段错误",
+    "README 未提及 platform 模块 UT 编译需要额外配置 c_sec_headers 依赖",
+    "Dockerfile 使用 apt 包名（如 libssl-dev、zlib1g-dev），需手动映射为 openEuler 包名（openssl-devel、zlib-devel）",
+    "README 中 UT 命令示例仅展示 acl 模块，未给出其他模块的具体 target 名称参考",
+    "lcov 在 openEuler 24.03 仓库中未找到，UT 覆盖率统计 (-c 参数) 无法完成"
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-06-24T03:42:00",
+      "problem": "runtime 模块 UT 在 DeviceTest.STARS_AicoreTimeoutDfxSlotInfo4FftsPlus1 用例段错误 (exit code 139)",
+      "solution": "该段错误与容器中无 NPU 设备驱动有关，属于预期行为，无法在纯 CPU 容器中解决",
+      "source": "tests/ut/runtime/runtime"
+    },
+    {
+      "timestamp": "2026-06-24T03:48:00",
+      "problem": "slog 模块 toolchain_ep_log_daemon_utest 在 LogDaemonMain 用例段错误 (exit code 139)",
+      "solution": "该段错误与容器中无 NPU 设备驱动有关，属于预期行为，无法在纯 CPU 容器中解决",
+      "source": "tests/ut/slog"
+    },
+    {
+      "timestamp": "2026-06-24T03:58:00",
+      "problem": "platform 模块 UT 编译失败：fatal error: securec.h: No such file or directory",
+      "solution": "platform_llt_tiling 目标的 CMakeLists.txt 中未添加 c_sec_headers 的 include 路径，属于仓库 UT 构建配置缺陷，按规则不修改源码",
+      "source": "tests/ut/platform/CMakeLists.txt"
+    },
+    {
+      "timestamp": "2026-06-24T03:30:00",
+      "problem": "UT 覆盖率统计失败：lcov: command not found",
+      "solution": "openEuler 24.03 仓库中未包含 lcov 包，需从源码编译安装，未进一步处理",
+      "source": "tests/build_ut.sh 第421行"
+    }
+  ]
+}

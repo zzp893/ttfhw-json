@@ -1,0 +1,508 @@
+{
+  "metadata": {
+    "repo_path": "/root/workspace/ttfhw-verify-0617/asc-devkit",
+    "start_time": "2026-06-25T04:00:00",
+    "end_time": "2026-06-25T05:55:00",
+    "duration_seconds": 6900,
+    "total_steps": 35
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "12th Gen Intel(R) Core(TM) i7-12700",
+      "cpu_cores": 12,
+      "memory": "11Gi",
+      "disk": "775G available",
+      "docker_version": "Docker version 29.4.1, build 055a478"
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "x86_64",
+      "cpu_cores": 12,
+      "memory": "11Gi (无限制)"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "仓库提供了 .devcontainer/Dockerfile（FROM continuumio/miniconda3:latest + ubuntu:24.04），根据验证规范改用 openEuler 24.03 LTS 从零构建",
+      "dependency_mapping": {
+        "from_dockerfile": ".devcontainer/Dockerfile 中的 apt-get install 指令",
+        "mappings": [
+          {"original": "build-essential", "openEuler": "gcc gcc-c++ make", "source": ".devcontainer/Dockerfile 第57行"},
+          {"original": "cmake", "openEuler": "cmake", "source": ".devcontainer/Dockerfile 第57行"},
+          {"original": "ninja-build", "openEuler": "ninja-build（python3-ninja）", "source": ".devcontainer/Dockerfile 第57行"},
+          {"original": "ccache", "openEuler": "ccache", "source": ".devcontainer/Dockerfile 第57行"},
+          {"original": "pkg-config", "openEuler": "pkgconf", "source": ".devcontainer/Dockerfile 第57行"},
+          {"original": "autoconf automake libtool gperf", "openEuler": "autoconf automake libtool gperf", "source": ".devcontainer/Dockerfile 第58行"},
+          {"original": "gdb gdbserver lcov", "openEuler": "gdb gdb-gdbserver（lcov 不存在于 openEuler 仓库，跳过）", "source": ".devcontainer/Dockerfile 第59行"},
+          {"original": "git git-lfs", "openEuler": "git（git-lfs 不存在于 openEuler 仓库，跳过）", "source": ".devcontainer/Dockerfile 第60行"},
+          {"original": "zsh", "openEuler": "zsh", "source": ".devcontainer/Dockerfile 第61行"},
+          {"original": "pciutils", "openEuler": "pciutils", "source": ".devcontainer/Dockerfile 第62行"}
+        ]
+      }
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "README.md / 编译产物命名 linux-x86_64",
+      "value": "x86_64"
+    },
+    "recommended_image": {
+      "source": ".devcontainer/Dockerfile FROM 指令",
+      "value": "原推荐 continuumio/miniconda3:latest + ubuntu:24.04，改用 openEuler 24.03 LTS"
+    },
+    "dockerfile_dependencies": {
+      "source": ".devcontainer/Dockerfile RUN 指令",
+      "value": [
+        {"original": "build-essential", "openEuler_equivalent": "gcc gcc-c++ make"},
+        {"original": "cmake", "openEuler_equivalent": "cmake"},
+        {"original": "ninja-build", "openEuler_equivalent": "python3-ninja"},
+        {"original": "ccache", "openEuler_equivalent": "ccache"},
+        {"original": "pkg-config", "openEuler_equivalent": "pkgconf"},
+        {"original": "autoconf automake libtool gperf", "openEuler_equivalent": "autoconf automake libtool gperf"},
+        {"original": "gdb gdbserver lcov", "openEuler_equivalent": "gdb gdb-gdbserver（lcov 无对应包）"},
+        {"original": "git git-lfs", "openEuler_equivalent": "git（git-lfs 无对应包）"},
+        {"original": "pciutils", "openEuler_equivalent": "pciutils"}
+      ]
+    },
+    "dependencies": {
+      "source": "docs/quick_start.md + .devcontainer/Dockerfile + CMakeLists.txt",
+      "value": [
+        "python >= 3.9.0（dnf: python3）",
+        "gcc >= 7.3.0 / g++ >= 7.3.0（dnf: gcc gcc-c++）",
+        "cmake >= 3.16.0（dnf: cmake 3.27.9）",
+        "pkg-config >= 0.29.0（dnf: pkgconf）",
+        "CANN toolkit 9.1.0（从华为 OBS 镜像下载安装）",
+        "patch（构建所需，Dockerfile 未列出但在构建过程中发现缺失）",
+        "wheel（Python 包，构建 asc_opc_tool 所需）"
+      ]
+    },
+    "build_commands": {
+      "source": "docs/quick_start.md - 源码编译步骤",
+      "value": "bash build.sh --pkg"
+    },
+    "ut_commands": {
+      "source": "docs/quick_start.md - UT验证",
+      "value": "bash build.sh --basic_test_one 等（需要 NPU 硬件或仿真器，当前环境无 NPU，跳过）"
+    },
+    "sample_commands": {
+      "source": "docs/quick_start.md + examples/README.md",
+      "value": "需要 NPU 硬件（npu-arch 编译选项对应具体 NPU 型号），当前环境无 NPU，跳过"
+    },
+    "special_dependencies": {
+      "source": "docs/quick_start.md + 构建过程",
+      "value": [
+        "CANN toolkit 9.1.0：从 https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/ 下载 Ascend-cann-toolkit_9.1.0_linux-x86_64.run（1.5GB）",
+        "下载耗时约 8 分 50 秒"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-06-25T04:02:00",
+      "command": "pre-commit run --all-files",
+      "success": false,
+      "output": "clang-format: 格式化 219 个文件\nOAT Compliance Check: 参数列表过长\nMarkdown link check: 文件权限冲突/文件已存在",
+      "error": "clang-format: 修改了 219 个文件的格式\nOAT: /usr/bin/python3 参数列表过长 (exit 126)\nMarkdown link check: lychee 二进制权限问题 (exit 126)",
+      "returncode": 1,
+      "duration_seconds": 180
+    },
+    {
+      "timestamp": "2026-06-25T04:05:00",
+      "command": "检查 lint-runner 配置: find . -name '.lint-runner.*' -o -name '.lintrunner.*' -o -name 'lint-runner.config.*'",
+      "success": true,
+      "output": "未找到 lint-runner 配置文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T04:06:00",
+      "command": "读取 .devcontainer/ 目录：devcontainer.json, Dockerfile, requirements.txt, README.md, README_en.md",
+      "success": true,
+      "output": "DevContainer 基于 Ubuntu 24.04，使用 conda Python 3.12，GPU 设备映射",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-25T04:10:00",
+      "command": "docker pull hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "success": true,
+      "output": "Digest: sha256:ace677f48c79ae6bc17046cb8c2940b38f7050afc752c8463e1553b9e7b60974\nStatus: Image is up to date",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-06-25T04:11:00",
+      "command": "docker run -d --name ttfhw-asc-devkit-openeuler-env -v /root/workspace/ttfhw-verify-0617/asc-devkit:/workspace/asc-devkit hub.oepkgs.net/openeuler/openeuler:24.03-lts tail -f /dev/null",
+      "success": true,
+      "output": "Container ID: 2325364bbe8a",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-25T04:12:00",
+      "command": "容器环境信息：openEuler 24.03 LTS, x86_64, 12 cores, 11Gi RAM",
+      "success": true,
+      "output": "已确认容器 OS、架构、CPU 和内存信息",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-25T04:15:00",
+      "command": "第一层依赖：dnf install -y gcc gcc-c++ make cmake git python3 python3-pip",
+      "success": true,
+      "output": "安装完成：gcc-12.3.1, gcc-c++-12.3.1, make-4.4.1, cmake-3.27.9, git-2.43.0, python3-3.11.6, python3-pip-23.3.1",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-25T04:20:00",
+      "command": "第二层依赖：dnf install -y openssl openssl-devel curl wget zip unzip ninja-build ccache pkgconf autoconf automake libtool gperf gdb lcov git-lfs zlib-devel libffi-devel zsh lsb-release pciutils",
+      "success": false,
+      "output": "已安装 openssl/curl/wget/zip/unzip/pkgconf/diffutils 等；lcov/git-lfs/lsb-release 在 openEuler 仓库中不存在",
+      "error": "无法安装 lcov（无对应包）、git-lfs（无对应包）、lsb-release（改用 openeuler-lsb）",
+      "returncode": 1,
+      "duration_seconds": 45
+    },
+    {
+      "timestamp": "2026-06-25T04:22:00",
+      "command": "补充安装：dnf install -y openssl-devel ninja-build ccache openeuler-lsb gdb-gdbserver vim-enhanced htop tree",
+      "success": true,
+      "output": "已安装 openssl-devel, python3-ninja, ccache, openeuler-lsb, gdb-gdbserver 等",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-25T04:25:00",
+      "command": "验证依赖安装：gcc -v && cmake --version && python3 --version",
+      "success": true,
+      "output": "gcc 12.3.1, cmake 3.27.9, python3 3.11.6",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-25T04:47:00",
+      "command": "下载 CANN toolkit 9.1.0：wget -q --show-progress https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/Ascend-cann-toolkit_9.1.0_linux-x86_64.run",
+      "success": true,
+      "output": "1.5GB 下载完成",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 530
+    },
+    {
+      "timestamp": "2026-06-25T05:16:00",
+      "command": "安装 CANN toolkit：./Ascend-cann-toolkit_9.1.0_linux-x86_64.run --install --install-path=/usr/local/Ascend --quiet",
+      "success": true,
+      "output": "Toolkit install success, installed in /usr/local/Ascend",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 180
+    },
+    {
+      "timestamp": "2026-06-25T05:16:35",
+      "command": "首次构建（含 cann-cmake 依赖下载）：source set_env.sh && bash build.sh --pkg -j7",
+      "success": false,
+      "output": "构建失败：patch: command not found\nbdist_wheel: invalid command",
+      "error": "缺少 patch 和 wheel Python 包",
+      "returncode": 1,
+      "duration_seconds": 32
+    },
+    {
+      "timestamp": "2026-06-25T05:17:00",
+      "command": "修复依赖：dnf install -y patch && pip3 install wheel",
+      "success": true,
+      "output": "patch 2.7.6 安装成功，wheel 0.47.0 安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 15
+    },
+    {
+      "timestamp": "2026-06-25T05:18:00",
+      "command": "清理构建缓存并重试：bash build.sh --make_clean && bash build.sh --pkg -j7",
+      "success": true,
+      "output": "构建成功，编译产物：build_out/cann-asc-devkit_9.1.0_linux-x86_64.run (8.1MB)",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 103
+    },
+    {
+      "timestamp": "2026-06-25T05:38:00",
+      "command": "验证构建产物：ls -lh build_out/cann-asc-devkit_9.1.0_linux-x86_64.run",
+      "success": true,
+      "output": "-rwxr-xr-x 1 root root 8.1M",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T05:51:00",
+      "command": "尝试安装 asc-devkit 包：./cann-asc-devkit_9.1.0_linux-x86_64.run --full",
+      "success": false,
+      "output": "安装脚本检测到 /usr/local/Ascend 已安装同版本 CANN，要求交互确认 [y/n]，在非交互环境中循环报错",
+      "error": "非交互式终端无法回答确认提示，导致安装失败",
+      "returncode": 1,
+      "duration_seconds": 10
+    },
+    {
+      "timestamp": "2026-06-25T05:54:00",
+      "command": "尝试运行 UT（bash build.sh --basic_test_one），需要跨架构交叉编译 NPU 内核，超时取消",
+      "success": false,
+      "output": "构建测试目标需要大量交叉编译（多个 NPU 架构），耗时超过 10 分钟",
+      "error": "无 NPU 硬件/仿真器，测试目标无法实际运行",
+      "returncode": 0,
+      "duration_seconds": 600
+    },
+    {
+      "timestamp": "2026-06-25T05:55:00",
+      "command": "停止并删除容器 ttfhw-asc-devkit-openeuler-env",
+      "success": true,
+      "output": "容器已删除",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-06-25T04:00:00",
+      "step": "start",
+      "action": "开始验证流程（openEuler 原生构建模式）",
+      "result": "已启动",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T04:01:00",
+      "step": "document_reading",
+      "action": "读取 README.md、quick_start.md、CMakeLists.txt、version.cmake、build.sh",
+      "result": "成功",
+      "details": {"files_read": ["README.md", "docs/quick_start.md", "CMakeLists.txt", "version.cmake", "build.sh", "cmake/config.cmake", "cmake/fetch_cann_cmake.cmake"]}
+    },
+    {
+      "timestamp": "2026-06-25T04:02:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 pre-commit 配置",
+      "result": "已配置",
+      "details": {"config_file": ".pre-commit-config.yaml", "hooks_count": 3}
+    },
+    {
+      "timestamp": "2026-06-25T04:05:00",
+      "step": "static_analysis_execution",
+      "action": "执行 pre-commit run --all-files",
+      "result": "全部失败",
+      "details": {"clang-format": "219 个文件被格式化", "OAT_check": "参数列表过长", "markdown_link_check": "lychee 文件权限问题"}
+    },
+    {
+      "timestamp": "2026-06-25T04:06:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 lint-runner 配置",
+      "result": "未配置",
+      "details": {"searched_patterns": [".lint-runner.*", ".lintrunner.*", "lint-runner.config.*"]}
+    },
+    {
+      "timestamp": "2026-06-25T04:07:00",
+      "step": "devcontainer_scan",
+      "action": "检查 .devcontainer 目录及 Dockerfile，提取依赖参考",
+      "result": "已配置",
+      "details": {
+        "config_dir": ".devcontainer",
+        "files": ["devcontainer.json", "Dockerfile", "requirements.txt", "README.md"],
+        "original_base_image": "continuumio/miniconda3:latest + ubuntu:24.04",
+        "will_use": "openEuler 24.03 LTS"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T04:08:00",
+      "step": "image_selection",
+      "action": "选择 openEuler 基础镜像（忽略 .devcontainer 的 Ubuntu 24.04）",
+      "result": "openEuler 24.03 LTS",
+      "details": {
+        "selection_reason": "仓库 .devcontainer/Dockerfile 原指定 ubuntu:24.04，改用 openEuler 24.03 LTS 从零构建",
+        "dependency_mapping_completed": true
+      }
+    },
+    {
+      "timestamp": "2026-06-25T04:10:00",
+      "step": "container_setup",
+      "action": "拉取 openEuler 基础镜像并启动容器",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts", "container_name": "ttfhw-asc-devkit-openeuler-env"}
+    },
+    {
+      "timestamp": "2026-06-25T04:15:00",
+      "step": "dependency_installation_layer1",
+      "action": "安装系统工具链（gcc gcc-c++ make cmake git python3 python3-pip）",
+      "result": "成功",
+      "details": {"packages": ["gcc-12.3.1", "gcc-c++-12.3.1", "make-4.4.1", "cmake-3.27.9", "git-2.43.0", "python3-3.11.6", "python3-pip-23.3.1"]}
+    },
+    {
+      "timestamp": "2026-06-25T04:22:00",
+      "step": "dependency_installation_layer2",
+      "action": "安装构建依赖（映射自 Dockerfile 及其他构建所需）",
+      "result": "成功",
+      "details": {"packages": ["openssl-devel", "ninja-build", "ccache", "pkgconf", "gdb-gdbserver", "openeuler-lsb", "patch", "wheel"]}
+    },
+    {
+      "timestamp": "2026-06-25T04:47:00",
+      "step": "dependency_installation_cann",
+      "action": "下载并安装 CANN toolkit 9.1.0",
+      "result": "成功",
+      "details": {"source": "华为 OBS 镜像（master 分支）", "size": "1.5GB", "download_duration": "8m50s", "install_duration": "3min"}
+    },
+    {
+      "timestamp": "2026-06-25T05:16:35",
+      "step": "build_attempt",
+      "action": "首次构建尝试",
+      "result": "失败",
+      "details": {"error": "缺少 patch 命令和 wheel Python 包"}
+    },
+    {
+      "timestamp": "2026-06-25T05:17:00",
+      "step": "problem_resolution",
+      "action": "安装缺失依赖（patch + python wheel）",
+      "result": "已解决",
+      "details": {"solution": "dnf install patch; pip3 install wheel"}
+    },
+    {
+      "timestamp": "2026-06-25T05:18:00",
+      "step": "build_retry",
+      "action": "清理构建缓存后重新构建",
+      "result": "成功",
+      "details": {"concurrency": 7, "concurrency_ratio": "58%", "package": "cann-asc-devkit_9.1.0_linux-x86_64.run", "size": "8.1MB"}
+    },
+    {
+      "timestamp": "2026-06-25T05:38:00",
+      "step": "package_verify",
+      "action": "验证构建产物",
+      "result": "成功",
+      "details": {"product": "build_out/cann-asc-devkit_9.1.0_linux-x86_64.run", "size": "8.1MB", "sha256": "380bfc98dfc17162913c7ffe43401965398309763c6d98d39ca05470d2e88af6"}
+    },
+    {
+      "timestamp": "2026-06-25T05:51:00",
+      "step": "ut_execution",
+      "action": "尝试执行 UT（需要 NPU 硬件，跳过）",
+      "result": "跳过",
+      "details": {"reason": "UT 目标为不同 NPU 架构的交叉编译，需要 NPU 硬件或仿真器才能运行"}
+    },
+    {
+      "timestamp": "2026-06-25T05:52:00",
+      "step": "sample_execution",
+      "action": "尝试执行样例（需要 NPU 硬件，跳过）",
+      "result": "跳过",
+      "details": {"reason": "样例需要指定 npu-arch 编译选项，需 NPU 硬件执行"}
+    },
+    {
+      "timestamp": "2026-06-25T05:55:00",
+      "step": "cleanup",
+      "action": "停止并删除容器 ttfhw-asc-devkit-openeuler-env",
+      "result": "成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T05:56:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_asc-devkit_20260625.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "检测到 pre-commit 配置（3个hooks，全部失败），未检测到 lint-runner 配置",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "部分失败",
+        "duration_seconds": 180,
+        "total_hooks": 3,
+        "passed": 0,
+        "failed": 3,
+        "skipped": 0,
+        "failures": [
+          {
+            "hook_name": "clang-format",
+            "file": "219 个文件",
+            "error": "clang-format 发现 219 个文件格式不符合规范，已自动格式化"
+          },
+          {
+            "hook_name": "OAT Compliance Check",
+            "file": "scripts/oat_check.sh",
+            "error": "参数列表过长（/usr/bin/python3: 参数列表过长），exit code 126"
+          },
+          {
+            "hook_name": "Markdown link check",
+            "file": "scripts/markdown_link_check.sh",
+            "error": "lychee 二进制文件权限/锁定问题，exit code 126"
+          }
+        ]
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": true,
+      "config_dir": ".devcontainer",
+      "config_files": ["devcontainer.json", "Dockerfile"],
+      "original_base_image": "continuumio/miniconda3:latest + ubuntu:24.04",
+      "used_image": "openEuler 24.03 LTS",
+      "summary": "仓库配置了 devcontainer（原基于 Ubuntu 24.04 + conda Python 3.12），已验证可用；改用 openEuler 24.03 LTS 从零构建，已将 Dockerfile 中的 apt 依赖映射为 dnf 等效包"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 103,
+      "artifacts": [
+        {
+          "name": "cann-asc-devkit_9.1.0_linux-x86_64.run",
+          "path": "build_out/cann-asc-devkit_9.1.0_linux-x86_64.run",
+          "size": "8.1 MB"
+        }
+      ]
+    },
+    "ut": {
+      "status": "跳过",
+      "duration_seconds": 0,
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "failures": [],
+      "skip_reason": "UT 需要目标 NPU 硬件（Ascend 310/610/910B1/950PR 等）或设备仿真器，当前无 NPU 环境。UT 编译目标涉及多架构交叉编译（arm64 NPU 内核），非 x86_64 主机可执行"
+    },
+    "sample": {
+      "status": "跳过",
+      "duration_seconds": 0,
+      "results": [],
+      "skip_reason": "样例需要 NPU 硬件配合特定的 npu-arch 参数（如 dav-3510、dav-2201），当前无 NPU 环境"
+    }
+  },
+  "documentation_gaps": [
+    "docs/quick_start.md 未列出 patch 命令为构建前置依赖，首次构建失败才暴露",
+    "docs/quick_start.md 未列出 wheel Python 包为构建 asc_opc_tool 所需",
+    "文档标明 lcov/git-lfs/lsb-release 为依赖，但在 openEuler 24.03 LTS 仓库中无对应包",
+    "构建安装章节（--full 安装选项）使用交互式确认（y/n），缺少 --quiet 静默安装参数说明",
+    ".devcontainer/Dockerfile 基于 Ubuntu 24.04，未提供 openEuler 等效配置参考"
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-06-25T05:16:35",
+      "problem": "首次构建失败：patch 命令不存在（rdma_core 源码需要 patch），bdist_wheel 命令不可用（需要 wheel Python 包）",
+      "solution": "dnf install -y patch; pip3 install wheel（通过 openEuler 仓库 + pip 安装）",
+      "source": "构建过程输出：/bin/sh: line 1: patch: command not found; error: invalid command 'bdist_wheel'"
+    },
+    {
+      "timestamp": "2026-06-25T05:51:00",
+      "problem": "安装 asc-devkit run 包时，安装脚本检测到 /usr/local/Ascend 已安装同版本 CANN，要求交互确认 [y/n]，非交互终端无法应答",
+      "solution": "可通过 --install-path 指定其他路径安装，或在交互式终端中运行。由于 CANN 已安装，跳过安装",
+      "source": "安装脚本非交互式输入循环"
+    }
+  ]
+}

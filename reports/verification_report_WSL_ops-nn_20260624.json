@@ -1,0 +1,401 @@
+{
+  "metadata": {
+    "repo_path": "/root/workspace/ttfhw-verify-0617/ops-nn",
+    "start_time": "2026-06-24T04:45:00",
+    "end_time": "2026-06-24T05:40:00",
+    "duration_seconds": 3300,
+    "total_steps": 15
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz",
+      "cpu_cores": 12,
+      "memory": "11Gi",
+      "disk": "619G available",
+      "docker_version": "Docker version 29.4.1"
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "x86_64",
+      "cpu_cores": 12,
+      "memory": "11Gi (无限制)"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "文档未指定具体基础镜像，按 openEuler 验证要求使用 openEuler 24.03 LTS 从零构建",
+      "dependency_mapping": {
+        "from_dockerfile": "仓库无 Dockerfile，依赖信息来自 install_deps.sh 和 README.md",
+        "mappings": [
+          {"original": "python >= 3.7.0", "openEuler": "python3 (openEuler 24.03 自带 3.11.6)", "source": "README.md"},
+          {"original": "gcc >= 7.3.0", "openEuler": "gcc gcc-c++ (openEuler 24.03 自带 12.3.1)", "source": "README.md"},
+          {"original": "cmake >= 3.16.0", "openEuler": "cmake (openEuler 24.03 自带 3.27.9)", "source": "README.md"},
+          {"original": "pigz >= 2.4", "openEuler": "pigz (openEuler 24.03 自带 2.7)", "source": "README.md"},
+          {"original": "dos2unix", "openEuler": "dos2unix", "source": "README.md"},
+          {"original": "make", "openEuler": "make", "source": "README.md"},
+          {"original": "patch", "openEuler": "patch", "source": "README.md"},
+          {"original": "CANN Toolkit", "openEuler": "从华为仓库下载安装 Ascend-cann-toolkit_9.1.0", "source": "README.md 环境准备章节"}
+        ]
+      }
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "README.md + docs/zh/install/quick_install.md",
+      "value": "x86_64 (支持 Atlas A2/A3/950 系列产品)"
+    },
+    "recommended_image": {
+      "source": "docs/zh/install/quick_install.md Docker部署章节",
+      "value": "文档推荐 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:9.1.0-beta.1-910b-openeuler24.03-py3.12-devel，但该镜像已预装 CANN，不符合从零构建要求，改用 openEuler 24.03 LTS 基础镜像"
+    },
+    "dockerfile_dependencies": {
+      "source": "仓库无 Dockerfile",
+      "value": []
+    },
+    "dependencies": {
+      "source": "README.md + install_deps.sh + docs/QUICKSTART.md",
+      "value": [
+        "python >= 3.7.0 (建议 <= 3.10) - dnf: python3",
+        "gcc >= 7.3.0 - dnf: gcc gcc-c++",
+        "cmake >= 3.16.0 - dnf: cmake",
+        "pigz >= 2.4 (可选) - dnf: pigz",
+        "dos2unix - dnf: dos2unix",
+        "make - dnf: make",
+        "patch - dnf: patch",
+        "googletest release-1.11.0 (仅 UT 依赖)",
+        "CANN Toolkit 9.1.0 - 从华为仓库下载",
+        "Python 包: pyyaml, absl-py>=2.0.0, jinja2>=3.1.0, numpy<2.0, decorator, sympy, scipy, attrs, psutil, protobuf, setuptools>=59.0.0, wheel"
+      ]
+    },
+    "build_commands": {
+      "source": "docs/QUICKSTART.md 编译运行章节",
+      "value": "bash build.sh --pkg --soc=${soc_version} --ops=${operator_name} -j${threads}"
+    },
+    "ut_commands": {
+      "source": "build.sh --help 输出",
+      "value": "bash build.sh -u (--noexec 仅编译不执行)"
+    },
+    "sample_commands": {
+      "source": "docs/QUICKSTART.md 快速验证章节",
+      "value": "bash build.sh --run_example ${operator_name} eager cust --vendor_name=custom"
+    },
+    "special_dependencies": {
+      "source": "docs/zh/install/quick_install.md",
+      "value": [
+        "CANN Toolkit: 从 https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/ 下载",
+        "NPU 驱动/固件: 运行态依赖，编译态可不安装"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-06-24T04:45:00",
+      "command": "git clone https://gitcode.com/cann/ops-nn.git",
+      "success": true,
+      "output": "克隆成功，17873 个文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-24T04:46:00",
+      "command": "阅读 README.md、QUICKSTART.md、install_deps.sh 提取构建依赖和命令",
+      "success": true,
+      "output": "提取到构建依赖：python>=3.7, gcc>=7.3, cmake>=3.16, pigz, dos2unix, make, patch, CANN Toolkit",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-24T04:47:00",
+      "command": "检查 .pre-commit-config.yaml",
+      "success": true,
+      "output": "找到 .pre-commit-config.yaml，包含6个hooks: trailing-whitespace, end-of-file-fixer, check-yaml, check-added-large-files, check-merge-conflict, detect-private-key, check-json, clang-format v18.1.8, ruff-check, ruff-format, codespell, OAT Compliance Check",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-06-24T04:47:30",
+      "command": "检查 lint-runner 配置",
+      "success": true,
+      "output": "未找到 lint-runner 配置文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-24T04:48:00",
+      "command": "检查 .devcontainer 目录",
+      "success": true,
+      "output": "未找到 .devcontainer 目录",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 2
+    },
+    {
+      "timestamp": "2026-06-24T04:49:00",
+      "command": "docker run -d --name ttfhw-ops-nn-openeuler-env -v /root/workspace/ttfhw-verify-0617/ops-nn:/workspace hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "success": true,
+      "output": "容器启动成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-06-24T04:50:00",
+      "command": "dnf install -y gcc gcc-c++ make cmake git python3 python3-pip patch dos2unix pigz wget",
+      "success": true,
+      "output": "安装完成：gcc-12.3.1, gcc-c++-12.3.1, make-4.4.1, cmake-3.27.9, git-2.43.0, python3-3.11.6, python3-pip-23.3.1, patch, dos2unix-7.5.2, pigz-2.7, wget-1.21.4",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-24T04:55:00",
+      "command": "wget https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/Ascend-cann-toolkit_9.1.0_linux-x86_64.run",
+      "success": true,
+      "output": "下载成功，文件大小 1.5GB",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 420
+    },
+    {
+      "timestamp": "2026-06-24T05:18:00",
+      "command": "./Ascend-cann-toolkit_9.1.0_linux-x86_64.run --install --install-path=/usr/local/Ascend --quiet",
+      "success": true,
+      "output": "CANN Toolkit 9.1.0 安装成功，路径 /usr/local/Ascend",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-06-24T05:20:00",
+      "command": "pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple numpy pyyaml jinja2 absl-py sympy scipy decorator attrs psutil protobuf setuptools wheel",
+      "success": true,
+      "output": "安装完成：numpy-2.4.6, pyyaml-6.0.3, jinja2-3.1.6, absl-py-2.4.0, sympy-1.14.0, scipy-1.17.1, decorator-5.3.1, attrs-26.1.0, psutil-7.2.2, protobuf-7.35.1, wheel-0.47.0",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-24T05:25:00",
+      "command": "bash build.sh --pkg --soc=ascend910b --ops=add_example -j7",
+      "success": true,
+      "output": "构建成功，生成 cann-ops-nn-custom_linux-x86_64.run (2.7MB)",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 660
+    },
+    {
+      "timestamp": "2026-06-24T05:36:00",
+      "command": "bash build.sh -u --noexec --soc=ascend910b --ops=add_example",
+      "success": true,
+      "output": "UT 编译成功，生成 nn_op_kernel_ut_ascend910B1 可执行文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-24T05:38:00",
+      "command": "./nn_op_kernel_ut_ascend910B1",
+      "success": true,
+      "output": "1 test from 1 test suite ran. 1 PASSED",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 3
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-06-24T04:45:00",
+      "step": "start",
+      "action": "开始验证流程（openEuler 原生构建模式）",
+      "result": "已启动",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-24T04:46:00",
+      "step": "document_reading",
+      "action": "读取 README.md、QUICKSTART.md、install_deps.sh 提取构建说明",
+      "result": "成功",
+      "details": {"files": ["README.md", "docs/QUICKSTART.md", "docs/zh/install/quick_install.md", "install_deps.sh"], "sections_read": ["环境准备", "构建", "UT", "样例"]}
+    },
+    {
+      "timestamp": "2026-06-24T04:47:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 pre-commit 配置",
+      "result": "已配置",
+      "details": {"config_file": ".pre-commit-config.yaml", "hooks_count": 6, "hooks": ["trailing-whitespace", "end-of-file-fixer", "check-yaml", "clang-format v18.1.8", "ruff-check", "codespell", "OAT Compliance Check"]}
+    },
+    {
+      "timestamp": "2026-06-24T04:47:30",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 lint-runner 配置",
+      "result": "未配置",
+      "details": {"searched_patterns": [".lint-runner.yaml", ".lint-runner.json", "lint-runner.config.*"]}
+    },
+    {
+      "timestamp": "2026-06-24T04:48:00",
+      "step": "devcontainer_scan",
+      "action": "检查 .devcontainer 目录",
+      "result": "未配置",
+      "details": {"searched_path": ".devcontainer"}
+    },
+    {
+      "timestamp": "2026-06-24T04:49:00",
+      "step": "container_setup",
+      "action": "拉取 openEuler 基础镜像并启动容器",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts", "container_name": "ttfhw-ops-nn-openeuler-env"}
+    },
+    {
+      "timestamp": "2026-06-24T04:50:00",
+      "step": "dependency_installation_layer1",
+      "action": "安装系统工具链（gcc gcc-c++ make cmake git python3 python3-pip patch dos2unix pigz wget）",
+      "result": "成功",
+      "details": {"source": "openEuler 官方仓库 (dnf)", "packages": ["gcc", "gcc-c++", "make", "cmake", "git", "python3", "python3-pip", "patch", "dos2unix", "pigz", "wget"]}
+    },
+    {
+      "timestamp": "2026-06-24T04:55:00",
+      "step": "dependency_installation_layer2",
+      "action": "下载 CANN Toolkit 9.1.0（从华为仓库）",
+      "result": "成功",
+      "details": {"source": "华为 Ascend 仓库", "package": "Ascend-cann-toolkit_9.1.0_linux-x86_64.run", "size": "1.5GB"}
+    },
+    {
+      "timestamp": "2026-06-24T05:18:00",
+      "step": "dependency_installation_layer3",
+      "action": "安装 CANN Toolkit 到 /usr/local/Ascend",
+      "result": "成功",
+      "details": {"install_path": "/usr/local/Ascend", "version": "9.1.0"}
+    },
+    {
+      "timestamp": "2026-06-24T05:20:00",
+      "step": "dependency_installation_layer4",
+      "action": "安装 Python 第三方库（使用清华镜像源）",
+      "result": "成功",
+      "details": {"source": "清华大学 pypi 镜像", "packages": ["numpy", "pyyaml", "jinja2", "absl-py", "sympy", "scipy", "decorator", "attrs", "psutil", "protobuf", "wheel"]}
+    },
+    {
+      "timestamp": "2026-06-24T05:25:00",
+      "step": "build_attempt",
+      "action": "执行单算子构建（bash build.sh --pkg --soc=ascend910b --ops=add_example -j7）",
+      "result": "成功",
+      "details": {"concurrency": 7, "concurrency_ratio": "58%", "operator": "add_example"}
+    },
+    {
+      "timestamp": "2026-06-24T05:36:00",
+      "step": "ut_build",
+      "action": "编译 UT 测试（bash build.sh -u --noexec --soc=ascend910b --ops=add_example）",
+      "result": "成功",
+      "details": {"target": "nn_op_kernel_ut_ascend910B1"}
+    },
+    {
+      "timestamp": "2026-06-24T05:38:00",
+      "step": "ut_execution",
+      "action": "执行 UT 测试",
+      "result": "成功",
+      "details": {"total": 1, "passed": 1, "failed": 0}
+    },
+    {
+      "timestamp": "2026-06-24T05:40:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_ops-nn_20260624.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "检测到 pre-commit 配置（6个hooks：基础检查、clang-format v18.1.8、ruff、codespell、OAT Compliance Check），未检测到 lint-runner 配置。因 clang-format v18 和 ruff 在容器中未安装，未执行 pre-commit run",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "未执行（缺少 clang-format v18 和 ruff 依赖）",
+        "duration_seconds": 0,
+        "total_hooks": 6,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 6,
+        "failures": []
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": false,
+      "config_dir": null,
+      "config_files": [],
+      "original_base_image": null,
+      "used_image": "openEuler 24.03 LTS",
+      "summary": "仓库未配置 devcontainer，文档推荐使用预装 CANN 的 Docker 镜像，改用 openEuler 24.03 LTS 基础镜像从零构建"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 660,
+      "artifacts": [
+        {
+          "name": "cann-ops-nn-custom_linux-x86_64.run",
+          "path": "/workspace/build_out/cann-ops-nn-custom_linux-x86_64.run",
+          "size": "2.7 MB"
+        }
+      ]
+    },
+    "ut": {
+      "status": "成功",
+      "duration_seconds": 63,
+      "total": 1,
+      "passed": 1,
+      "failed": 0,
+      "failures": [],
+      "module_details": [
+        {
+          "module": "add_example",
+          "target": "nn_op_kernel_ut_ascend910B1",
+          "status": "成功",
+          "total": 1,
+          "passed": 1,
+          "failed": 0
+        }
+      ]
+    },
+    "sample": {
+      "status": "未执行",
+      "duration_seconds": 0,
+      "results": [],
+      "note": "样例执行需要 NPU 设备，容器中无 NPU 设备无法运行"
+    }
+  },
+  "documentation_gaps": [
+    "README 未明确说明 CANN Toolkit 的具体下载链接，仅提供通用下载页面",
+    "文档推荐的 Docker 镜像已预装 CANN，不符合从零构建验证要求",
+    "Python 依赖版本要求 numpy<2.0 与实际安装的 numpy 2.4.6 存在差异，但构建和 UT 仍成功",
+    "未提供 devcontainer 配置，对新手开发者环境搭建不够友好",
+    "UT 命令说明不够详细，需通过 build.sh --help 才能看到完整参数"
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-06-24T04:55:00",
+      "problem": "CANN Toolkit 下载链接 403 Forbidden",
+      "solution": "改用 master 版本目录下的具体版本链接：https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/Ascend-cann-toolkit_9.1.0_linux-x86_64.run",
+      "source": "docs/zh/install/quick_install.md"
+    },
+    {
+      "timestamp": "2026-06-24T05:20:00",
+      "problem": "pip 安装 Python 包超时失败",
+      "solution": "使用清华大学 pypi 镜像源：pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple",
+      "source": "requirements.txt"
+    },
+    {
+      "timestamp": "2026-06-24T05:38:00",
+      "problem": "UT 执行提示 getenv BUILD_PATH failed",
+      "solution": "该警告不影响测试执行，UT 仍成功通过",
+      "source": "tests/ut/op_kernel"
+    }
+  ]
+}

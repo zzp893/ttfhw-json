@@ -1,0 +1,419 @@
+{
+  "metadata": {
+    "repo_path": "/root/workspace/ttfhw-verify-0617/opbase",
+    "start_time": "2026-06-25T02:30:00",
+    "end_time": "2026-06-25T04:00:00",
+    "duration_seconds": 5400,
+    "total_steps": 7
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz",
+      "cpu_cores": 12,
+      "memory": "11Gi",
+      "disk": "775G available",
+      "docker_version": "Docker version 29.4.1, build 055a478"
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "x86_64",
+      "cpu_cores": 12,
+      "memory": "11Gi (无限制)"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "仓库无Dockerfile（文档推荐镜像为 Ubuntu 22.04 的 CANN 预装镜像，改用 openEuler 24.03 LTS）",
+      "dependency_mapping": []
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "build.sh 中 run 包命名模式 cann-opbase_${cann_version}_linux-${arch}",
+      "value": "支持 x86_64 和 aarch64"
+    },
+    "recommended_image": {
+      "source": "docs/zh/install/quick_install.md 行52-56",
+      "value": "swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops（改用 openEuler 24.03 LTS）"
+    },
+    "dependencies": {
+      "source": "docs/QUICKSTART.md + quick_install.md + install_deps.sh + CMakeLists.txt",
+      "value": [
+        "python >= 3.7.0（建议 <= 3.10）",
+        "gcc/g++ >= 7.3.0（实际 12.3.1）",
+        "cmake >= 3.16.0（实际 3.27.9）",
+        "make",
+        "pigz（可选，>= 2.4）",
+        "patch >= 2.7",
+        "dos2unix",
+        "git",
+        "googletest release-1.11.0（UT时依赖）"
+      ]
+    },
+    "build_commands": {
+      "source": "docs/QUICKSTART.md 行61",
+      "value": "bash build.sh"
+    },
+    "ut_commands": {
+      "source": "docs/QUICKSTART.md 行148",
+      "value": "bash build.sh -u"
+    },
+    "sample_commands": {
+      "source": "无专门示例章节",
+      "value": "无（仅有 UT 作为验证手段）"
+    },
+    "special_dependencies": {
+      "source": "docs/QUICKSTART.md 行43-48 + CMakeLists.txt",
+      "value": [
+        "CANN toolkit 需预先安装（ASCEND_HOME_PATH 环境变量）",
+        "编译时自动下载：json-3.11.3, makeself-2.5.0, eigen-5.0.0, protobuf-25.1, abseil-cpp-20230802.1, cann-cmake",
+        "pip3: pyyaml"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "command": "检查 pre-commit 配置",
+      "success": false,
+      "output": ".pre-commit-config.yaml 存在但 YAML 解析失败（使用了 tab 缩进而非空格）",
+      "error": "YAML 文件中使用 tab 字符（\\t），不符合 YAML 规范",
+      "returncode": 1,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T02:30:01",
+      "command": "检查 lint-runner 配置",
+      "success": true,
+      "output": "未找到 lint-runner 配置文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T02:30:02",
+      "command": "ls .devcontainer/",
+      "success": false,
+      "output": "未找到 .devcontainer 目录",
+      "error": "目录不存在",
+      "returncode": 1,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T02:30:30",
+      "command": "docker pull hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "success": true,
+      "output": "openEuler 24.03 LTS 基础镜像拉取成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-25T02:31:00",
+      "command": "Layer 1: dnf install -y gcc gcc-c++ cmake python3-pip git python3-devel",
+      "success": true,
+      "output": "gcc 12.3.1, cmake 3.27.9, python3.11 安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 180
+    },
+    {
+      "timestamp": "2026-06-25T02:34:00",
+      "command": "Layer 2: dnf install -y pigz dos2unix patch gtest gtest-devel pkgconfig make",
+      "success": true,
+      "output": "所有系统依赖安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-25T02:36:00",
+      "command": "Layer 3: pip3 install pyyaml（requirements.txt）",
+      "success": true,
+      "output": "pyyaml 6.0.3 安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "command": "下载并安装 CANN toolkit 9.1.0",
+      "success": true,
+      "output": "Ascend-cann-toolkit_9.1.0_linux-x86_64.run (1.5GB) 下载并安装至 /usr/local/Ascend",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 600
+    },
+    {
+      "timestamp": "2026-06-25T02:54:00",
+      "command": "bash build.sh -j7（首次构建）",
+      "success": true,
+      "output": "Self-extractable archive cann-opbase_9.0.0_linux-x86_64.run successfully created",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 576
+    },
+    {
+      "timestamp": "2026-06-25T03:04:00",
+      "command": "bash build.sh -u -j7（执行 UT）",
+      "success": true,
+      "output": "nnopbase_utest + op_common_utest: 共 5 tests from 2 test suites, 全部 PASSED",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 255
+    },
+    {
+      "timestamp": "2026-06-25T03:54:00",
+      "command": "安装 opbase 包: ./build_out/cann-opbase_9.0.0_linux-x86_64.run --full --install-path=/usr/local/Ascend",
+      "success": true,
+      "output": "OpsBase package upgraded successfully（安装至 /usr/local/Ascend/cann-9.1.0）",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 3
+    },
+    {
+      "timestamp": "2026-06-25T03:54:10",
+      "command": "Smoke test: ctypes.CDLL('libnnopbase.so')",
+      "success": true,
+      "output": "libnnopbase.so loaded OK",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "start",
+      "action": "开始验证流程",
+      "result": "已启动",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "document_reading",
+      "action": "从 README 入口按链接逐层阅读所有文档",
+      "result": "成功",
+      "details": {
+        "files_read": [
+          "README.md",
+          "docs/QUICKSTART.md",
+          "docs/README.md",
+          "docs/zh/install/quick_install.md",
+          "docs/zh/install/build.md",
+          "docs/zh/appendix/dir_structure.md",
+          "CMakeLists.txt",
+          "build.sh",
+          "install_deps.sh",
+          "version.cmake",
+          "cmake/config.cmake"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 pre-commit 配置",
+      "result": "已配置但 YAML 格式错误",
+      "details": {"config_file": ".pre-commit-config.yaml", "error": "使用了 tab 缩进，不合法"}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 lint-runner 配置",
+      "result": "未配置",
+      "details": {"searched_patterns": [".lint-runner.yaml", ".lint-runner.json", "lint-runner.config.*"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:02",
+      "step": "devcontainer_scan",
+      "action": "检查 .devcontainer 目录及配置",
+      "result": "未配置",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:15",
+      "step": "image_selection",
+      "action": "选择基础镜像（仓库无 Dockerfile）",
+      "result": "openEuler 24.03 LTS",
+      "details": {
+        "selection_reason": "文档推荐 Ubuntu 22.04 的 CANN 预装镜像 swr.cn-south-1.myhuaweicloud.com/ascendhub/cann:8.5.0-910b-ubuntu22.04-py3.10-ops，改用 openEuler 24.03 LTS"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T02:30:30",
+      "step": "container_setup",
+      "action": "拉取镜像并启动容器",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts"}
+    },
+    {
+      "timestamp": "2026-06-25T02:31:00",
+      "step": "dependency_installation_layer1",
+      "action": "安装系统工具链：gcc, g++, cmake, python3, git",
+      "result": "成功",
+      "details": {"packages": ["gcc-12.3.1", "gcc-c++-12.3.1", "cmake-3.27.9", "python3.11", "git"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:34:00",
+      "step": "dependency_installation_layer2",
+      "action": "安装构建依赖：pigz, dos2unix, patch, gtest, gtest-devel, pkgconfig",
+      "result": "成功",
+      "details": {"packages": ["pigz", "dos2unix", "patch", "gtest-1.14.0", "gtest-devel", "pkgconfig"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:36:00",
+      "step": "dependency_installation_layer3",
+      "action": "安装 Python 依赖：pyyaml",
+      "result": "成功",
+      "details": {"packages": ["pyyaml-6.0.3"], "source": "pip Tsinghua mirror"}
+    },
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "step": "dependency_installation_cann",
+      "action": "下载并安装 CANN toolkit 9.1.0（外部依赖）",
+      "result": "成功",
+      "details": {
+        "url": "https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/Ascend-cann-toolkit_9.1.0_linux-x86_64.run",
+        "size": "1.5GB",
+        "install_path": "/usr/local/Ascend"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T02:54:00",
+      "step": "build",
+      "action": "构建：bash build.sh -j7",
+      "result": "成功",
+      "details": {
+        "concurrency": 7,
+        "concurrency_ratio": "58%",
+        "artifact": "cann-opbase_9.0.0_linux-x86_64.run (9.4MB)",
+        "duration": "9m36s",
+        "note": "构建时自动下载第三方依赖（protobuf, eigen, json, abseil-cpp, makeself, cann-cmake）"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T03:04:00",
+      "step": "ut_execution",
+      "action": "执行 UT：bash build.sh -u -j7",
+      "result": "成功",
+      "details": {
+        "test_suites": 2,
+        "total": 5,
+        "passed": 5,
+        "failed": 0,
+        "binaries": ["nnopbase_utest", "op_common_utest"],
+        "duration": "4m15s"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T03:54:00",
+      "step": "install_and_smoketest",
+      "action": "安装 opbase 包并加载动态库验证",
+      "result": "成功",
+      "details": {
+        "install_path": "/usr/local/Ascend/cann-9.1.0/x86_64-linux/lib64/libnnopbase.so",
+        "smoke_test": "ctypes.CDLL('libnnopbase.so') - loaded OK"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T04:00:00",
+      "step": "cleanup",
+      "action": "停止并删除容器",
+      "result": "成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T04:00:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_opbase_20260625.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "检测到 pre-commit 配置但 YAML 格式错误（tab 缩进），未检测到 lint-runner 配置",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "YAML 解析失败",
+        "duration_seconds": 1,
+        "total_hooks": 2,
+        "passed": 0,
+        "failed": 0,
+        "skipped": 2,
+        "failures": [
+          {
+            "hook_name": "clang-format",
+            "file": "N/A",
+            "error": ".pre-commit-config.yaml 使用了 tab 缩进，YAML 解析失败，pre-commit 无法加载"
+          },
+          {
+            "hook_name": "oat-check",
+            "file": "N/A",
+            "error": "同上，YAML 格式错误导致整个配置无法加载"
+          }
+        ]
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": false,
+      "config_dir": null,
+      "config_files": [],
+      "summary": "仓库未配置 devcontainer"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 576,
+      "summary": "构建成功，自动下载第三方依赖（protobuf-25.1, eigen-5.0.0, json-3.11.3, abseil-cpp, makeself, cann-cmake）",
+      "artifacts": [
+        {
+          "name": "cann-opbase_9.0.0_linux-x86_64.run",
+          "path": "build_out/cann-opbase_9.0.0_linux-x86_64.run",
+          "size": "9.4MB"
+        }
+      ]
+    },
+    "ut": {
+      "status": "成功",
+      "duration_seconds": 255,
+      "total": 5,
+      "passed": 5,
+      "failed": 0,
+      "failures": []
+    },
+    "sample": {
+      "status": "不适用",
+      "summary": "opbase 为基础框架库，无示例/样例；通过 smoke test（加载 libnnopbase.so）验证产物可用"
+    }
+  },
+  "documentation_gaps": [
+    "仓库无 Dockerfile，文档推荐 Ubuntu 22.04 的 CANN 预装镜像，新开发者在 openEuler 上需手动安装 CANN toolkit",
+    "CANN toolkit 不在 openEuler dnf 仓库中，需从华为 DevCloud 镜像下载安装（1.5GB）",
+    "install_deps.sh 会从 GitHub 下载 googletest 源码编译，但 openEuler 的 dnf 直接提供 gtest/gtest-devel，脚本未优先检测系统包",
+    "python 建议版本 <= 3.10，但 openEuler 24.03 默认提供 python3.11（实测兼容）",
+    "pre-commit 配置文件使用了 tab 缩进（YAML 不合法），新开发者 clone 后 pre-commit 无法直接使用"
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "problem": "CANN toolkit 不在 openEuler dnf 仓库中",
+      "solution": "从华为 DevCloud 镜像下载 Ascend-cann-toolkit_9.1.0_linux-x86_64.run（1.5GB）并安装",
+      "source": "外部资源（https://ascend.devcloud.huaweicloud.com）"
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "problem": ".pre-commit-config.yaml 使用 tab 缩进，pre-commit 无法解析",
+      "solution": "需将 yaml 文件中的 tab 替换为空格才能使用 pre-commit，属于仓库文档缺陷",
+      "source": "仓库根目录 .pre-commit-config.yaml"
+    }
+  ],
+  "session_export_file": "verification_session_WSL_opbase_20260625.md"
+}

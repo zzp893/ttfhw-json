@@ -1,0 +1,435 @@
+{
+  "metadata": {
+    "repo_path": "/root/workspace/ttfhw-verify-0617/ops-cv",
+    "start_time": "2026-06-25T02:30:00",
+    "end_time": "2026-06-25T03:10:00",
+    "duration_seconds": 2400,
+    "total_steps": 8
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "Intel(R) Core(TM) i7-10700 CPU @ 2.90GHz",
+      "cpu_cores": 12,
+      "memory": "11Gi",
+      "disk": "775G available",
+      "docker_version": "Docker version 29.4.1, build 055a478"
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "x86_64",
+      "cpu_cores": 12,
+      "memory": "11Gi (无限制)"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "仓库无Dockerfile且无devcontainer，按默认策略使用openEuler 24.03 LTS基础镜像；CANN toolkit需手动下载安装"
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "文档未指定架构要求",
+      "value": "文档未指定，默认使用 x86_64"
+    },
+    "recommended_image": {
+      "source": "仓库无推荐镜像配置",
+      "value": "无"
+    },
+    "dependencies": {
+      "source": "README.md + install_deps.sh + requirements.txt",
+      "value": [
+        "python >= 3.7.0",
+        "gcc/g++ >= 7.3.0（实际 12.3.1）",
+        "cmake >= 3.16.0（实际 3.27.9）",
+        "pigz（可选）",
+        "dos2unix",
+        "patch",
+        "pkg-config",
+        "googletest/googletest-devel（仅UT时依赖）",
+        "pip3: pyyaml, absl-py, jinja2, numpy<2.0, setuptools, wheel, decorator, sympy, attrs",
+        "CANN toolkit（外部下载安装）"
+      ]
+    },
+    "build_commands": {
+      "source": "docs/QUICKSTART.md 行55 + docs/zh/install/compile.md",
+      "value": "bash build.sh --pkg --soc=ascend910b --ops=grid_sample -j7"
+    },
+    "ut_commands": {
+      "source": "docs/zh/install/compile.md 行245 + build.sh --help",
+      "value": "bash build.sh -u --ophost --ops=grid_sample"
+    },
+    "sample_commands": {
+      "source": "docs/QUICKSTART.md 行95",
+      "value": "bash build.sh --run_example grid_sample eager cust --vendor_name=custom"
+    },
+    "special_dependencies": {
+      "source": "CMakeLists.txt + build.sh",
+      "value": [
+        "CANN toolkit必须预先安装（ASCEND_HOME_PATH环境变量）",
+        "自定义算子包示例需要ops-math包安装后方可链接（libopapi_math.so依赖）"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "command": "pre-commit run --all-files",
+      "success": false,
+      "output": "2个hook：clang-format（修改了文件）和 OAT Compliance Check（8个合规问题）均失败",
+      "error": "clang-format 会修改源文件格式；OAT工具报告8个合规问题",
+      "returncode": 1,
+      "duration_seconds": 15
+    },
+    {
+      "timestamp": "2026-06-25T02:30:10",
+      "command": "检查 lint-runner 配置",
+      "success": true,
+      "output": "未找到 lint-runner 配置文件",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T02:30:11",
+      "command": "ls .devcontainer/",
+      "success": false,
+      "output": "未找到 .devcontainer 目录",
+      "error": "目录不存在",
+      "returncode": 1,
+      "duration_seconds": 1
+    },
+    {
+      "timestamp": "2026-06-25T02:30:30",
+      "command": "docker pull hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "success": true,
+      "output": "openEuler 24.03 LTS 基础镜像拉取成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30
+    },
+    {
+      "timestamp": "2026-06-25T02:31:00",
+      "command": "Layer 1: dnf install gcc gcc-c++ cmake python3-pip git python3-devel",
+      "success": true,
+      "output": "gcc 12.3.1, cmake 3.27.9, python3.11 安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 180
+    },
+    {
+      "timestamp": "2026-06-25T02:34:00",
+      "command": "Layer 2: dnf install pigz dos2unix patch gtest gtest-devel pkgconfig make",
+      "success": true,
+      "output": "所有系统依赖安装成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-06-25T02:38:00",
+      "command": "Layer 3: pip3 install -r requirements.txt（Tsinghua镜像）",
+      "success": true,
+      "output": "11个包全部安装成功（numpy 1.26.4, jinja2 3.1.6, sympy 1.14.0等）",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "command": "下载并安装 CANN toolkit 9.1.0",
+      "success": true,
+      "output": "Ascend-cann-toolkit_9.1.0_linux-x86_64.run (1.5GB) 下载并安装至 /usr/local/Ascend",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 600
+    },
+    {
+      "timestamp": "2026-06-25T02:54:00",
+      "command": "bash build.sh --pkg --soc=ascend910b --ops=grid_sample -j7",
+      "success": true,
+      "output": "Self-extractable archive cann-ops-cv-custom-linux.x86_64.run successfully created.",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 428
+    },
+    {
+      "timestamp": "2026-06-25T03:01:30",
+      "command": "安装自定义算子包: ./build_out/cann-ops-cv-custom-linux.x86_64.run --force",
+      "success": true,
+      "output": "安装成功（--force跳过libopapi_math.so校验，该库属于ops-math包）",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 10
+    },
+    {
+      "timestamp": "2026-06-25T03:08:30",
+      "command": "bash build.sh -u --ophost --ops=grid_sample",
+      "success": true,
+      "output": "30 tests from 4 test suites ran. (29 ms total) [PASSED] 30 tests.",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 29
+    },
+    {
+      "timestamp": "2026-06-25T03:09:15",
+      "command": "bash build.sh --run_example grid_sample eager cust --vendor_name=custom",
+      "success": false,
+      "output": "链接失败：libcust_opapi.so 引用了 libopapi_math.so 中的符号（如 ViewCopy, Cast 等），但该库未安装",
+      "error": "ops-cv自定义算子包依赖ops-math包的libopapi_math.so，单独安装ops-cv无法完成链接",
+      "returncode": 1,
+      "duration_seconds": 7
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "start",
+      "action": "开始验证流程",
+      "result": "已启动",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "document_reading",
+      "action": "从README入口按链接逐层阅读所有文档",
+      "result": "成功",
+      "details": {
+        "files_read": [
+          "README.md",
+          "docs/QUICKSTART.md",
+          "docs/README.md",
+          "docs/zh/install/quick_install.md",
+          "docs/zh/install/compile.md",
+          "docs/zh/install/build.md",
+          "CMakeLists.txt",
+          "build.sh",
+          "install_deps.sh",
+          "cmake/dependencies.cmake",
+          "cmake/fetch_cann_cmake.cmake",
+          "cmake/third_party/opbase.cmake"
+        ]
+      }
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 pre-commit 配置",
+      "result": "已配置",
+      "details": {"config_file": ".pre-commit-config.yaml", "hooks_count": 2}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:00",
+      "step": "static_analysis_execution",
+      "action": "执行 pre-commit run --all-files",
+      "result": "失败（2个hook均失败）",
+      "details": {"passed": 0, "failed": 2, "skipped": 0}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:10",
+      "step": "static_analysis_scan",
+      "action": "检查仓库 lint-runner 配置",
+      "result": "未配置",
+      "details": {"searched_patterns": [".lint-runner.yaml", ".lint-runner.json", "lint-runner.config.*"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:11",
+      "step": "devcontainer_scan",
+      "action": "检查 .devcontainer 目录及配置",
+      "result": "未配置",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:15",
+      "step": "image_selection",
+      "action": "选择基础镜像（仓库无Dockerfile）",
+      "result": "openEuler 24.03 LTS",
+      "details": {"selection_reason": "无推荐镜像，使用默认 openEuler 24.03 LTS 基础镜像"}
+    },
+    {
+      "timestamp": "2026-06-25T02:30:30",
+      "step": "container_setup",
+      "action": "拉取镜像并启动容器",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts"}
+    },
+    {
+      "timestamp": "2026-06-25T02:31:00",
+      "step": "dependency_installation_layer1",
+      "action": "安装 toolchain: gcc, g++, cmake, python3, git",
+      "result": "成功",
+      "details": {"packages": ["gcc-12.3.1", "gcc-c++-12.3.1", "cmake-3.27.9", "python3.11", "git"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:34:00",
+      "step": "dependency_installation_layer2",
+      "action": "安装构建依赖: pigz, dos2unix, patch, gtest, gtest-devel, pkgconfig",
+      "result": "成功",
+      "details": {"packages": ["pigz", "dos2unix", "patch", "gtest", "gtest-devel", "pkgconfig"]}
+    },
+    {
+      "timestamp": "2026-06-25T02:38:00",
+      "step": "dependency_installation_layer3",
+      "action": "安装 Python 依赖: requirements.txt（Tsinghua镜像）",
+      "result": "成功",
+      "details": {"packages": 11, "source": "pip Tsinghua mirror"}
+    },
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "step": "dependency_installation_cann",
+      "action": "下载并安装 CANN toolkit 9.1.0（外部依赖）",
+      "result": "成功",
+      "details": {
+        "url": "https://ascend.devcloud.huaweicloud.com/artifactory/cann-run-mirror/software/master/20260617000327045/Ascend-cann-toolkit_9.1.0_linux-x86_64.run",
+        "size": "1.5GB",
+        "install_path": "/usr/local/Ascend"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T02:54:00",
+      "step": "build",
+      "action": "构建: bash build.sh --pkg --soc=ascend910b --ops=grid_sample -j7",
+      "result": "成功",
+      "details": {"concurrency": 7, "concurrency_ratio": "58%", "artifact": "cann-ops-cv-custom-linux.x86_64.run", "duration": "7m08s"}
+    },
+    {
+      "timestamp": "2026-06-25T03:01:30",
+      "step": "install",
+      "action": "安装自定义算子包",
+      "result": "成功",
+      "details": {"install_path": "/usr/local/Ascend/cann-9.1.0/opp/vendors/custom_cv", "note": "使用--force跳过libopapi_math.so校验"}
+    },
+    {
+      "timestamp": "2026-06-25T03:08:30",
+      "step": "ut_execution",
+      "action": "执行UT: bash build.sh -u --ophost --ops=grid_sample",
+      "result": "成功",
+      "details": {"total": 30, "passed": 30, "failed": 0, "duration": "29ms"}
+    },
+    {
+      "timestamp": "2026-06-25T03:09:15",
+      "step": "sample_execution",
+      "action": "运行样例: bash build.sh --run_example grid_sample eager cust --vendor_name=custom",
+      "result": "失败",
+      "details": {"error": "libcust_opapi.so依赖libopapi_math.so（ops-math包），链接失败"}
+    },
+    {
+      "timestamp": "2026-06-25T03:10:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_ops-cv_20260625.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "检测到 pre-commit 配置（2个hooks，均失败），未检测到 lint-runner 配置",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "失败",
+        "duration_seconds": 15,
+        "total_hooks": 2,
+        "passed": 0,
+        "failed": 2,
+        "skipped": 0,
+        "failures": [
+          {
+            "hook_name": "clang-format",
+            "file": "全局",
+            "error": "clang-format 修改了源文件格式（需要 --allow-missing-config）"
+          },
+          {
+            "hook_name": "oat-check",
+            "file": "全局",
+            "error": "OAT合规检查失败（8个合规问题）"
+          }
+        ]
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": false,
+      "config_dir": null,
+      "config_files": [],
+      "summary": "仓库未配置 devcontainer"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 428,
+      "summary": "单算子编译（grid_sample）成功，生成自定义算子安装包 cann-ops-cv-custom-linux.x86_64.run",
+      "artifacts": [
+        {
+          "name": "cann-ops-cv-custom-linux.x86_64.run",
+          "path": "build_out/cann-ops-cv-custom-linux.x86_64.run",
+          "size": "约50MB"
+        }
+      ]
+    },
+    "ut": {
+      "status": "成功",
+      "duration_seconds": 29,
+      "total": 30,
+      "passed": 30,
+      "failed": 0,
+      "failures": []
+    },
+    "sample": {
+      "status": "失败（跨包依赖）",
+      "duration_seconds": 7,
+      "results": [
+        {
+          "sample_name": "test_aclnn_grid_sample2_d",
+          "execution_status": "失败",
+          "output_summary": "链接阶段失败：libcust_opapi.so需要libopapi_math.so（属于ops-math包）提供l0op::ViewCopy、Cast、Transpose等符号",
+          "execution_time": "7秒",
+          "root_cause": "ops-cv自定义算子包的libcust_opapi.so链接了ops-math的libopapi_math.so接口"
+        }
+      ]
+    }
+  },
+  "cross_repository_dependencies": {
+    "ops-math": {
+      "dependency_type": "编译时链接",
+      "affected_package": "libcust_opapi.so",
+      "missing_symbols": [
+        "l0op::ViewCopy", "l0op::Cast", "l0op::Transpose",
+        "l0op::TransData", "l0op::Contiguous", "l0op::ReFormat",
+        "l0op::TransDataSpecial", "l0op::UnsqueezeNd", "l0op::SqueezeNd"
+      ],
+      "resolution": "需先安装ops-math包或同时构建ops-cv和ops-math"
+    }
+  },
+  "documentation_gaps": [
+    "仓库无Dockerfile或devcontainer配置，新开发者需自行搭建环境",
+    "CANN toolkit不是openEuler dnf仓库的一部分，需从外部下载（华为镜像），文档未提及此步骤",
+    "QUICKSTART.md 以add_example算子为例，但该算子不在ops-cv仓库标准算子列表中，使用--ops=add_example编译会报错",
+    "QUICKSTART.md 未说明 --run_example 需要 ops-math 包预先安装，单独构建ops-cv后无法运行示例",
+    "install_deps.sh 会尝试安装python3.10（与openEuler 24.03默认python3.11冲突），需要手动调整"
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-06-25T02:45:00",
+      "problem": "CANN toolkit不在openEuler dnf仓库中",
+      "solution": "从华为DevCloud镜像下载安装 Ascend-cann-toolkit_9.1.0_linux-x86_64.run（1.5GB）",
+      "source": "外部资源（https://ascend.devcloud.huaweicloud.com）"
+    },
+    {
+      "timestamp": "2026-06-25T03:01:30",
+      "problem": "自定义算子包安装时shared library校验失败（缺少libopapi_math.so）",
+      "solution": "使用 --force 参数跳过校验（该库属于ops-math包，不影响ops-cv主机侧功能）",
+      "source": "交叉依赖：ops-cv的libcust_opapi.so引用了ops-math的符号"
+    },
+    {
+      "timestamp": "2026-06-25T03:09:15",
+      "problem": "运行样例时链接失败，libcust_opapi.so缺少libopapi_math.so提供的符号",
+      "solution": "需要先安装ops-math包或同时构建两个仓库；单一ops-cv构建无法独立运行cust模式示例",
+      "source": "跨仓库依赖（ops-cv -> ops-math）"
+    }
+  ],
+  "session_export_file": "verification_session_WSL_ops-cv_20260625.md"
+}
