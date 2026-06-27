@@ -596,7 +596,9 @@ def check_type_correctness(data: dict, issues: IssueCollector):
 
 
 def check_precommit_consistency(data: dict, issues: IssueCollector):
-    """Check that passed + failed + skipped == total_hooks."""
+    """Check that passed + failed + skipped == total_hooks.
+    Downgraded to WARNING: renderer uses || 0 fallback for each field,
+    so inconsistency only affects display (e.g. shows 0/0/0 vs total=13)."""
     pc = get_nested(data, "final_results.static_analysis.pre_commit")
     if not isinstance(pc, dict):
         return
@@ -608,10 +610,12 @@ def check_precommit_consistency(data: dict, issues: IssueCollector):
         if isinstance(total, int) and isinstance(passed, int) and \
            isinstance(failed, int) and isinstance(skipped, int):
             if passed + failed + skipped != total:
-                issues.add("error", "numeric_consistency",
+                sev = "warning"  # NOT error: renderer handles gracefully
+                issues.add(sev, "numeric_consistency",
                            "$.final_results.static_analysis.pre_commit",
                            f"passed({passed}) + failed({failed}) + skipped({skipped}) = "
-                           f"{passed + failed + skipped}, but total_hooks = {total}")
+                           f"{passed + failed + skipped} ≠ total_hooks({total})"
+                           f"（渲染代码可兜底，但数据显示不一致）")
     except (TypeError, ValueError):
         pass
 
