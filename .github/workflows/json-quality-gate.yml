@@ -59,14 +59,45 @@ jobs:
         run: |
           echo "No JSON files changed. Skipping quality checks."
 
-      # Run TRUSTED scripts from base/ on PR's JSON files
+      # Run TRUSTED scripts from base/ on PR's JSON files.
+      # Set +e so we always capture output even when errors are found.
       - name: Run deterministic validation
         if: steps.changed-files.outputs.any_changed == 'true'
         id: validate
         working-directory: pr
         run: |
-          python3 ../base/scripts/validate_json.py ${{ steps.changed-files.outputs.all_changed_files }} > /tmp/deterministic_results.json
+          set +e
+          python3 ../base/scripts/validate_json.py ${{ steps.changed-files.outputs.all_changed_files }} > /tmp/deterministic_results.json 2>/tmp/validate_stderr.txt
+          VALIDATE_EXIT=$?
+          echo "::group::确定性检查结果"
           cat /tmp/deterministic_results.json
+          echo "::endgroup::"
+          # Print error summary
+          python3 -c "
+          import json
+          with open('/tmp/deterministic_results.json') as f:
+              d = json.load(f)
+          error_files = []
+          for path, info in d.get('files', {}).items():
+              errors = [i for i in info.get('issues', []) if i.get('severity') == 'error']
+              if errors:
+                  error_files.append((path, errors))
+          if error_files:
+              print()
+              print('=' * 60)
+              print(f'🚫 发现 {sum(len(e[1]) for e in error_files)} 个 ERROR（阻塞合入）:')
+              print('=' * 60)
+              for path, errors in error_files:
+                  print(f'\n📄 {path.split(\"/\")[-1]}')
+                  for e in errors:
+                      print(f'  [{e.get(\"check\",\"?\")}] {e.get(\"path\",\"$\")}')
+                      print(f'    {e.get(\"message\",\"\")}')
+              print()
+              print(f'::error:: 确定性检查发现 ERROR 级别问题，将阻塞 PR 合入')
+          else:
+              print('✅ 无 ERROR 级别问题')
+          "
+          exit $VALIDATE_EXIT
 
       - name: Run AI semantic analysis
         if: steps.changed-files.outputs.any_changed == 'true'
