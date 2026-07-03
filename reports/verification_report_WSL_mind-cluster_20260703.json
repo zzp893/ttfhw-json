@@ -1,0 +1,536 @@
+{
+  "metadata": {
+    "repo_path": "https://gitcode.com/dongpeng18/mind-cluster/tree/ttfhw (WSL 发行版 node0；干净源码挂载至容器 /workspace，Go 组件构建目录 /usr1/gopath)",
+    "repo_branch": "ttfhw",
+    "start_time": "2026-07-03T14:00:00",
+    "end_time": "2026-07-03T16:10:00",
+    "duration_seconds": 7800,
+    "total_steps": 26
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "x86_64",
+      "cpu_model": "12th Gen Intel(R) Core(TM) i7-12700",
+      "cpu_cores": 20,
+      "memory": "15Gi",
+      "disk": "1007G 总量，约 900G 可用 (overlay /)",
+      "docker_version": "Docker version 20.10.9 (WSL 发行版 node0)"
+    },
+    "container": {
+      "os": "openEuler release 24.03 (LTS)",
+      "architecture": "x86_64",
+      "cpu_cores": 20,
+      "memory": "15Gi (无限制)",
+      "container_name": "ttfhw-mind-cluster-openeuler-env"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+      "selection_reason": "强制使用 openEuler 24.03 LTS 官方基础镜像从零构建，禁止使用任何预构建/预装依赖镜像。仓库 component/*/build 下同时提供 Dockerfile.ubuntu 与 Dockerfile.openeuler 两套镜像定义，按技能约束忽略 ubuntu 版本，采用 openEuler 版本对应的依赖清单。",
+      "dependency_mapping": {
+        "from_dockerfile": "component/*/build/Dockerfile.openeuler 与 build/README.md 的依赖说明",
+        "mappings": [
+          {"original": "apt: swig python3-dev libnuma-dev g++ (Dockerfile.ubuntu / mindio README Ubuntu 段)", "openEuler": "dnf: swig python3-devel numactl-devel gcc-c++", "source": "build/README.md mindio 组件编译依赖表"},
+          {"original": "apt: build-essential", "openEuler": "dnf: gcc gcc-c++ make", "source": "build/README.md 系统工具链"},
+          {"original": "libz (链接 -lz)", "openEuler": "dnf: zlib-devel", "source": "mindio ockiod 链接阶段 ld 报错定位"},
+          {"original": "swig>=4.2 (abi3 wheel 需要，dnf 仅 4.1.1)", "openEuler": "pip: swig>=4.2,<4.4 (装得 4.3.1)", "source": "mindio python_sdk SWIG 生成代码在 Py_LIMITED_API 下报 PyTuple 宏未声明"}
+        ]
+      }
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "build/README.md + 各组件 go.mod",
+      "value": "x86_64 (linux/amd64)"
+    },
+    "recommended_image": {
+      "source": "component/*/build/Dockerfile.openeuler / Dockerfile.ubuntu",
+      "value": "仓库同时提供 openeuler 与 ubuntu 两套 Dockerfile；按技能约束统一改用 openEuler 24.03 LTS 基础镜像从零构建"
+    },
+    "dockerfile_dependencies": {
+      "source": "build/README.md（openEuler 从零构建环境准备 / mindio 组件编译依赖）",
+      "value": [
+        {"original": "apt install swig python3-dev libnuma-dev cmake make g++ git dos2unix", "openEuler_equivalent": "dnf install -y swig python3-devel numactl-devel cmake make gcc-c++ git dos2unix"},
+        {"original": "pip3 install wheel setuptools", "openEuler_equivalent": "pip3 install wheel setuptools (openEuler 仓库无对应版本时用 pip)"}
+      ]
+    },
+    "dependencies": {
+      "source": "build/README.md + service_config.ini + 各组件 requirements.txt",
+      "value": [
+        "gcc / gcc-c++ / make (dnf 12.3.1/4.4.1) —— C/C++ 组件 (mindio/taskd/ascend-docker-runtime)",
+        "cmake >= 3.14.1 (dnf 3.27.9) —— mindio C++ 构建",
+        "swig —— mindio acp/tft python_sdk 绑定；dnf 仅 4.1.1，abi3 wheel 需 >=4.2，改用 pip 安装 SWIG 4.3.1",
+        "python3 / python3-devel / python3-pip (dnf 3.11.6) —— Python 组件与 mindio 头文件",
+        "numactl-devel (dnf，映射 Ubuntu libnuma-dev) —— mindio <numa.h>",
+        "zlib-devel (dnf) —— mindio ockiod 链接 -lz",
+        "git / wget / unzip / dos2unix (dnf) —— 源码/三方拉取与脚本换行转换",
+        "Go 1.26.4 —— dnf 仅提供 1.21.4 不满足，手动安装官方 go1.26.4.linux-amd64",
+        "yq (mikefarah v4.44.3) 与 helm (v3.15.4) —— helm-deploy-tool 打包 chart，README 未记录，改用 go install 安装",
+        "pip: wheel setuptools scikit-learn pandas numpy ply paramiko scp cryptography openpyxl grpcio protobuf pyOpenSSL —— ascend-faultdiag / taskd"
+      ]
+    },
+    "build_commands": {
+      "source": "build/README.md 编译章节",
+      "value": "cd build && dos2unix *.sh && chmod +x *.sh && ./build_all.sh $GOPATH；单组件: ./build_each.sh $GOPATH service_config.ini <组件名>；mindio 单独 cd mindio/build && ./build.sh；helm-deploy-tool cd helm-deploy-tool/build && ./build.sh"
+    },
+    "ut_commands": {
+      "source": "build/README.md 单元测试执行章节",
+      "value": "逐模块: go mod tidy && export TZ=Asia/Shanghai && export GOFLAGS=\"-gcflags=all=-l -mod=mod\" && go test -count=1 -timeout 1200s ./..."
+    },
+    "sample_commands": {
+      "source": "build/README.md",
+      "value": "无独立样例程序；构建产物为各组件 output 目录下的二进制/so/wheel/chart 包，对 wheel 产物执行 pip install 冒烟测试验证可安装，并 import 验证 mindio_ttp"
+    },
+    "special_dependencies": {
+      "source": "build/README.md 自动拉取源码失败 / 环境准备",
+      "value": [
+        "Volcano v1.9.0 与 v1.7.0 官方源码：ascend-for-volcano 构建需先克隆到 /opt/buildtools/volcano_opensource/volcano_1.9 与 volcano_1.7（github 限速改用 gitee 镜像）",
+        "libboundscheck (v1.1.16) / spdlog (v1.12.0)：随 mindio acp/tft build 脚本自动 clone；tft 从 atomgit clone libboundscheck 超时，复用 acp 已成功 clone 的三方源码规避",
+        "SWIG >= 4.2：mindio python_sdk 在 Py_LIMITED_API=0x03070000 下需要，dnf 4.1.1 不满足，pip 安装 SWIG 4.3.1",
+        "yq (mikefarah) 与 helm：helm-deploy-tool 打包 chart 依赖，README 未记录，go install 安装",
+        "Go 1.26.4 官方发行版需手动 wget 安装（dnf 仓库版本 1.21.4 不满足）",
+        "taskd 使用 GOTOOLCHAIN=local 规避 go.mod toolchain 指令触发的工具链自动下载"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-07-03T14:02:00",
+      "command": "docker run -d --name ttfhw-mind-cluster-openeuler-env --security-opt seccomp=unconfined --dns 223.5.5.5 --dns 114.114.114.114 -v <干净源码>:/workspace hub.oepkgs.net/openeuler/openeuler:24.03-lts tail -f /dev/null",
+      "success": true,
+      "output": "容器启动成功；放开 seccomp 以避免旧版 Docker 20.10.x 拦截 clone3 导致 dnf getaddrinfo 线程创建失败",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 3
+    },
+    {
+      "timestamp": "2026-07-03T14:05:00",
+      "command": "第一层系统工具链: dnf makecache && dnf install -y gcc gcc-c++ make cmake git wget unzip dos2unix python3 python3-pip python3-devel swig numactl-devel zlib-devel",
+      "success": true,
+      "output": "安装完成: gcc 12.3.1, make 4.4.1, cmake 3.27.9, git 2.43.0, python3 3.11.6, swig 4.1.1, numactl-devel, zlib-devel",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120
+    },
+    {
+      "timestamp": "2026-07-03T14:10:00",
+      "command": "第二层 Go 1.26: wget go1.26.4.linux-amd64.tar.gz && tar -C /usr/local -xzf; go env -w GOPROXY=https://goproxy.cn,direct GOTOOLCHAIN=local GOSUMDB=off",
+      "success": true,
+      "output": "go version go1.26.4 linux/amd64",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60,
+      "note": "dnf 仓库 golang 仅 1.21.4 不满足 go.mod 要求 1.26，改手动安装官方发行版；GOTOOLCHAIN=local 规避工具链自动下载"
+    },
+    {
+      "timestamp": "2026-07-03T14:14:00",
+      "command": "第三层 pip 依赖: pip3 install wheel setuptools scikit-learn pandas numpy ply paramiko scp cryptography openpyxl grpcio protobuf pyOpenSSL",
+      "success": true,
+      "output": "Successfully installed; all imports OK",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 147
+    },
+    {
+      "timestamp": "2026-07-03T14:20:00",
+      "command": "源码准备: 复制 component/* -> /usr1/gopath；克隆 volcano 1.7/1.9 (gitee 镜像)、libboundscheck、makeself",
+      "success": true,
+      "output": "volcano_1.7 / volcano_1.9 克隆成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 200
+    },
+    {
+      "timestamp": "2026-07-03T14:35:00",
+      "command": "全量构建首轮: ./build_each.sh /usr1/gopath service_config.ini <组件> (13 组件顺序构建)",
+      "success": false,
+      "output": "11 组件构建成功；mindio 与 helm-deploy-tool 首轮失败",
+      "error": "mindio: SWIG 4.1.1 生成的 python_sdk 代码在 Py_LIMITED_API=0x03070000 下报 'PyTuple_GET_SIZE'/'PyTuple_GET_ITEM' was not declared；helm-deploy-tool: 缺少 yq / helm 命令",
+      "returncode": 1,
+      "duration_seconds": 590
+    },
+    {
+      "timestamp": "2026-07-03T14:50:00",
+      "command": "mindio 修复: pip3 install \"swig>=4.2,<4.4\" -i https://mirrors.aliyun.com/pypi/simple/ (装得 SWIG 4.3.1 到 /usr/local/bin，前置于 dnf 的 4.1.1)",
+      "success": true,
+      "output": "SWIG 4.3.1 安装成功；cmake find_package(SWIG) 命中新版",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 40,
+      "note": "SWIG >= 4.2.0 才修复 abi3(Py_LIMITED_API) 下 PyTuple 宏问题；不修改源码，用工具链版本升级解决"
+    },
+    {
+      "timestamp": "2026-07-03T15:00:00",
+      "command": "mindio tft 三方规避: 复制 acp 已成功 clone 的 libboundscheck(v1.1.16)+spdlog 到 tft/3rdparty，再 cd mindio/tft/build && ./build.sh；随后组装 cp acp/tft 两个 wheel 到 mindio/output",
+      "success": true,
+      "output": "TFT 构建成功；产出 mindio_ttp-7.3.0 wheel + libttp_framework.so/_ttp_c2python_api.so/libttp_c_api.so",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 30,
+      "note": "tft build.sh 从 atomgit.com clone libboundscheck 超时(curl 56 Connection timed out)，复用 acp 三方源码规避网络问题"
+    },
+    {
+      "timestamp": "2026-07-03T15:10:00",
+      "command": "helm-deploy-tool 修复: go install github.com/mikefarah/yq/v4@v4.44.3 && go install helm.sh/helm/v3/cmd/helm@v3.15.4 (GOBIN=/usr/local/bin)，再 cd helm-deploy-tool/build && ./build.sh",
+      "success": true,
+      "output": "yq v4.44.3 / helm v3.15.4 安装成功；chart 打包成功: mindcluster-deploy-tool-26.1.0.tgz / mindcluster-crds-deploy-tool-26.1.0.tgz / helm_tool.sh",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 120,
+      "note": "helm go install 首次因 goproxy.cn connection reset 失败，重试续传模块缓存成功"
+    },
+    {
+      "timestamp": "2026-07-03T15:20:00",
+      "command": "构建复核: 全部 13 组件 + helm-deploy-tool 产物齐全 (二进制/so/wheel/chart)",
+      "success": true,
+      "output": "13/13 组件 + helm-deploy-tool 全部构建成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-07-03T15:25:00",
+      "command": "单元测试: 逐模块 export TZ=Asia/Shanghai; GOFLAGS=\"-gcflags=all=-l -mod=mod\"; go mod tidy && go test -count=1 -timeout 1200s ./... (12 Go 模块)",
+      "success": true,
+      "output": "12/12 模块全部通过，共 221 个测试包 (ok)，0 失败",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 1000
+    },
+    {
+      "timestamp": "2026-07-03T15:55:00",
+      "command": "静态检查: pip install pre-commit; 容器内 /tmp/pcsrc 一次性源码副本 git init; PRE_COMMIT_HOME=/tmp/pchome pre-commit run --all-files",
+      "success": false,
+      "output": "13 个 hook: 3 通过 (check-added-large-files/check-merge-conflict/check-json)，10 失败 (trailing-whitespace/end-of-file-fixer/check-yaml/detect-private-key/ruff-check/ruff-format/pylint/bandit/typos/clang-format)",
+      "error": "自动格式化类 hook 在未按规范格式化的存量代码上修改文件即报失败；check-yaml 命中 helm-deploy-tool 生成的含 {{ }} 模板占位符的 chart yaml；detect-private-key 命中测试证书 component/mindio/tft/test/llt/openssl_cert/keys/key.pem；ruff/pylint/bandit/typos 为常规静态告警",
+      "returncode": 1,
+      "duration_seconds": 157,
+      "note": "在容器内一次性源码副本上运行，不改动宿主机真实仓库；hook 仓库从 gitcode.com 镜像克隆成功"
+    },
+    {
+      "timestamp": "2026-07-03T16:00:00",
+      "command": "wheel 冒烟测试: 对 6 个去重后的构建产出 wheel 执行 pip3 install --no-deps --force-reinstall，并 python3 -c 'import mindio_ttp'",
+      "success": true,
+      "output": "全部 install_rc=0: mindio_acp / mindio_ttp / taskd / alan_faultdiag / ascend_faultdiag / ascend_faultdiag_toolkit；import mindio_ttp OK",
+      "error": "import mindio_acp 报 ModuleNotFoundError: No module named 'torch' (运行时重依赖未装，wheel 本身有效)",
+      "returncode": 0,
+      "duration_seconds": 10
+    },
+    {
+      "timestamp": "2026-07-03T16:10:00",
+      "command": "docker stop ttfhw-mind-cluster-openeuler-env && docker rm ttfhw-mind-cluster-openeuler-env",
+      "success": true,
+      "output": "容器已停止并删除",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 6
+    }
+  ],
+  "process_timeline": [
+    {
+      "timestamp": "2026-07-03T14:00:00",
+      "step": "start",
+      "action": "开始验证流程（openEuler 原生从零构建模式），目标仓库 mind-cluster ttfhw 分支",
+      "result": "已启动",
+      "details": {"repo": "https://gitcode.com/dongpeng18/mind-cluster/tree/ttfhw"}
+    },
+    {
+      "timestamp": "2026-07-03T14:00:30",
+      "step": "document_reading",
+      "action": "阅读 build/README.md 了解统一编译/测试入口、openEuler 环境准备、mindio 依赖、Volcano 手动拉取说明",
+      "result": "成功",
+      "details": {"file": "build/README.md", "sections_read": ["编译", "openEuler从零构建环境准备", "mindio组件编译依赖", "自动拉取源码失败", "单元测试执行"]}
+    },
+    {
+      "timestamp": "2026-07-03T14:00:50",
+      "step": "dockerfile_analysis",
+      "action": "读取各组件 build/Dockerfile.openeuler 与 Dockerfile.ubuntu，提取依赖并映射到 openEuler 等效包",
+      "result": "成功",
+      "details": {"note": "忽略 ubuntu 版本 FROM，采用 openEuler 依赖清单；libnuma-dev→numactl-devel, python3-dev→python3-devel"}
+    },
+    {
+      "timestamp": "2026-07-03T14:01:10",
+      "step": "static_analysis_scan",
+      "action": "本地扫描 pre-commit 与 lint-runner 配置",
+      "result": "已扫描",
+      "details": {"pre_commit": ".pre-commit-config.yaml 存在（13 个 hook）", "lint_runner": "未发现 .lintrunner.toml 等配置"}
+    },
+    {
+      "timestamp": "2026-07-03T14:01:30",
+      "step": "devcontainer_scan",
+      "action": "检查仓库根 .devcontainer 目录",
+      "result": "未配置",
+      "details": {"config_dir": ".devcontainer", "found": false}
+    },
+    {
+      "timestamp": "2026-07-03T14:02:00",
+      "step": "container_setup",
+      "action": "拉取 openEuler 24.03 LTS 基础镜像并启动容器（放开 seccomp，指定 DNS）",
+      "result": "成功",
+      "details": {"image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts", "container_name": "ttfhw-mind-cluster-openeuler-env"}
+    },
+    {
+      "timestamp": "2026-07-03T14:05:00",
+      "step": "dependency_installation_layer1",
+      "action": "dnf 安装系统工具链（gcc gcc-c++ make cmake git wget unzip dos2unix python3 python3-pip python3-devel swig numactl-devel zlib-devel）",
+      "result": "成功",
+      "details": {"source": "openEuler 官方仓库 (dnf)"}
+    },
+    {
+      "timestamp": "2026-07-03T14:10:00",
+      "step": "dependency_installation_go",
+      "action": "手动安装 Go 1.26.4 官方发行版（dnf 仅 1.21.4 不满足 go.mod 要求 1.26），设置 GOTOOLCHAIN=local",
+      "result": "成功",
+      "details": {"version": "go1.26.4 linux/amd64", "env": "GOPROXY=https://goproxy.cn,direct GOTOOLCHAIN=local GOSUMDB=off"}
+    },
+    {
+      "timestamp": "2026-07-03T14:14:00",
+      "step": "dependency_installation_layer3",
+      "action": "pip3 安装 Python 组件依赖（scikit-learn pandas numpy ply paramiko scp cryptography openpyxl grpcio protobuf pyOpenSSL 等）",
+      "result": "成功",
+      "details": {"duration_seconds": 147, "verify": "all imports OK"}
+    },
+    {
+      "timestamp": "2026-07-03T14:20:00",
+      "step": "source_preparation",
+      "action": "复制组件源码到 GOPATH，克隆 Volcano 1.7/1.9 官方源码（gitee 镜像）",
+      "result": "成功",
+      "details": {"volcano_1.7": "成功", "volcano_1.9": "gitee 镜像成功"}
+    },
+    {
+      "timestamp": "2026-07-03T14:35:00",
+      "step": "build_attempt",
+      "action": "首轮全量构建 13 个组件（build_each.sh）",
+      "result": "部分失败",
+      "details": {"succeeded": 11, "failed": 2, "failed_components": ["mindio (SWIG 4.1.1 + Py_LIMITED_API 下 PyTuple 宏未声明)", "helm-deploy-tool (缺 yq/helm)"]}
+    },
+    {
+      "timestamp": "2026-07-03T14:50:00",
+      "step": "problem_resolution",
+      "action": "mindio 修复：pip 安装 SWIG 4.3.1（>=4.2）替代 dnf 的 4.1.1，解决 abi3 wheel 生成代码的 PyTuple 宏问题（不改源码）",
+      "result": "已解决",
+      "details": {"solution": "pip3 install swig>=4.2,<4.4；/usr/local/bin/swig 前置让 cmake find_package 命中 4.3.1", "source": "mindio acp/src/sdk/memfs/python_sdk/CMakeLists.txt 第14行无条件启用 -DPy_LIMITED_API=0x03070000"}
+    },
+    {
+      "timestamp": "2026-07-03T15:00:00",
+      "step": "problem_resolution",
+      "action": "mindio tft 三方规避：复制 acp 已成功 clone 的 libboundscheck v1.1.16 与 spdlog 到 tft/3rdparty，绕过 atomgit clone 超时后重建 tft",
+      "result": "已解决",
+      "details": {"solution": "cp -rf acp/3rdparty/{libboundscheck,spdlog} tft/3rdparty/ 后 ./build.sh", "source": "mindio/tft/build/build.sh 第85-90行 clone atomgit libboundscheck 超时"}
+    },
+    {
+      "timestamp": "2026-07-03T15:10:00",
+      "step": "problem_resolution",
+      "action": "helm-deploy-tool 修复：go install 安装 yq v4.44.3 与 helm v3.15.4 后重建",
+      "result": "已解决",
+      "details": {"solution": "go install github.com/mikefarah/yq/v4@v4.44.3 + helm.sh/helm/v3/cmd/helm@v3.15.4", "source": "helm-deploy-tool/build/split_yaml.sh 用 yq eval，build.sh 用 helm package"}
+    },
+    {
+      "timestamp": "2026-07-03T15:20:00",
+      "step": "build_retry",
+      "action": "修复后复核全部产物",
+      "result": "成功",
+      "details": {"succeeded": 13, "failed": 0, "extra": "helm-deploy-tool chart 打包成功"}
+    },
+    {
+      "timestamp": "2026-07-03T15:25:00",
+      "step": "ut_execution",
+      "action": "逐模块执行 go test（TZ=Asia/Shanghai，禁用内联，-mod=mod，timeout 1200s）",
+      "result": "全部通过",
+      "details": {"modules_tested": 12, "fully_passed": 12, "with_failures": 0, "total_test_packages": 221}
+    },
+    {
+      "timestamp": "2026-07-03T15:55:00",
+      "step": "static_analysis_execution",
+      "action": "安装 pre-commit 4.6.0，在容器一次性源码副本上执行 pre-commit run --all-files",
+      "result": "部分通过",
+      "details": {"passed": 3, "failed": 10, "skipped": 0}
+    },
+    {
+      "timestamp": "2026-07-03T16:00:00",
+      "step": "sample_execution",
+      "action": "对 6 个 wheel 构建产物执行 pip install 冒烟测试并 import 验证",
+      "result": "成功",
+      "details": {"wheels": 6, "install_rc_all_zero": true, "import_check": "import mindio_ttp OK"}
+    },
+    {
+      "timestamp": "2026-07-03T16:10:00",
+      "step": "cleanup",
+      "action": "停止并删除容器 ttfhw-mind-cluster-openeuler-env",
+      "result": "成功",
+      "details": {}
+    },
+    {
+      "timestamp": "2026-07-03T16:11:00",
+      "step": "report_generation",
+      "action": "生成验证报告",
+      "result": "成功",
+      "details": {"output_file": "verification_report_WSL_mind-cluster_20260703.json"}
+    }
+  ],
+  "final_results": {
+    "static_analysis": {
+      "enabled": true,
+      "summary": "仓库配置了 pre-commit（.pre-commit-config.yaml，13 个 hook），未配置 lint-runner。本轮安装 pre-commit 4.6.0 并在容器一次性源码副本上执行 pre-commit run --all-files：3 个 hook 通过，10 个失败。失败以自动格式化类 hook（trailing-whitespace/end-of-file-fixer/ruff-format/ruff-check/clang-format）为主——它们在未按 pre-commit 规范格式化的存量代码上会修改文件并报失败；check-yaml 命中 helm-deploy-tool 构建生成的含 Helm 模板占位符 {{ }} 的 chart yaml；detect-private-key 命中测试证书私钥；pylint/bandit/typos 为常规静态告警。均为存量代码质量提示，不影响构建与测试结果。",
+      "pre_commit": {
+        "configured": true,
+        "config_file": ".pre-commit-config.yaml",
+        "status": "部分通过",
+        "duration_seconds": 157,
+        "total_hooks": 13,
+        "passed": 3,
+        "failed": 10,
+        "skipped": 0,
+        "passed_hooks": ["check-added-large-files", "check-merge-conflict", "check-json"],
+        "failures": [
+          {"hook_name": "trailing-whitespace", "error": "多处文件行尾存在多余空白，hook 自动修改文件即判失败"},
+          {"hook_name": "end-of-file-fixer", "file": "component/ascend-faultdiag/src/ascend_fd/configuration/aicore-error-code-config-en.json 等", "error": "文件末尾缺少换行，hook 自动修复即判失败"},
+          {"hook_name": "check-yaml", "file": "helm-deploy-tool/app/charts/*/yamls/*/*.yaml", "error": "构建生成的 chart yaml 含 Helm 模板占位符 {{ }}，严格 YAML 解析报 expected <block end> but found <scalar>"},
+          {"hook_name": "detect-private-key", "file": "component/mindio/tft/test/llt/openssl_cert/keys/key.pem", "error": "命中测试用途私钥"},
+          {"hook_name": "ruff-check", "error": "ascend-faultdiag / mindio python_whl 大量 F401(未使用导入)/F841(未使用变量)/E402/E722/SIM115 告警"},
+          {"hook_name": "ruff-format", "error": "存量 Python 代码未按 ruff-format 规范格式化"},
+          {"hook_name": "pylint", "error": "常规 Python 代码质量告警"},
+          {"hook_name": "bandit", "error": "B110(try-except-pass)/B108(硬编码临时目录)/B301(pickle) 等安全告警"},
+          {"hook_name": "typos", "error": "拼写检查告警"},
+          {"hook_name": "clang-format", "error": "ascend-docker-runtime / ascend-common / taskd / ascend-device-plugin 多处 C/C++ 头文件与源文件未按 Google 风格(IndentWidth 4, ColumnLimit 120, Allman) 格式化，hook 自动格式化即判失败"}
+        ]
+      },
+      "lint_runner": {
+        "configured": false,
+        "config_file": null
+      }
+    },
+    "devcontainer": {
+      "enabled": false,
+      "config_dir": ".devcontainer",
+      "config_files": [],
+      "original_base_image": null,
+      "used_image": "openEuler 24.03 LTS",
+      "summary": "仓库根目录未配置 .devcontainer；改从各组件 build/Dockerfile.openeuler 与 build/README.md 提取依赖，统一在 openEuler 24.03 LTS 基础镜像从零构建"
+    },
+    "build": {
+      "status": "成功",
+      "duration_seconds": 750,
+      "summary": "13 个组件 + helm-deploy-tool 全部构建成功。首轮 mindio(SWIG 4.1.1/abi3) 与 helm-deploy-tool(缺 yq/helm) 失败，分别通过 pip 安装 SWIG 4.3.1 + 复用 acp 三方源码、go install yq/helm 修复后成功。",
+      "components_total": 14,
+      "components_succeeded": 14,
+      "components_failed": 0,
+      "components": [
+        "ascend-common(库)", "ascend-device-plugin", "ascend-docker-runtime", "ascend-operator",
+        "ascend-for-volcano", "clusterd", "container-manager", "infer-operator",
+        "k8s-rdma-shared-dev-plugin", "noded", "npu-exporter", "ascend-faultdiag",
+        "mindio", "taskd", "helm-deploy-tool"
+      ],
+      "artifacts": [
+        {"name": "device-plugin", "path": "ascend-device-plugin/output/device-plugin", "size": "66 MB"},
+        {"name": "clusterd", "path": "clusterd/output/clusterd", "size": "51 MB"},
+        {"name": "noded", "path": "noded/output/noded", "size": "51 MB"},
+        {"name": "mindio_acp wheel", "path": "mindio/output/mindio_acp-7.3.0-py3-none-linux_x86_64.whl", "size": "3.1 MB"},
+        {"name": "mindio_ttp wheel", "path": "mindio/output/mindio_ttp-7.3.0-py3-none-linux_x86_64.whl", "size": "916 KB"},
+        {"name": "mindio _c2python_api.so", "path": "mindio/acp/output/lib/_c2python_api.so", "size": "3.5 MB"},
+        {"name": "mindio libttp_framework.so", "path": "mindio/tft/output/lib/libttp_framework.so", "size": "1.9 MB"},
+        {"name": "taskd wheel", "path": "taskd/output/taskd-6.0.0-py3-none-linux_x86_64.whl", "size": "7.4 MB"},
+        {"name": "ascend_faultdiag wheel", "path": "ascend-faultdiag/output/ascend_faultdiag-6.0.0-py3-none-linux_x86_64.whl", "size": "916 KB"},
+        {"name": "mindcluster-deploy-tool chart", "path": "helm-deploy-tool/output/mindcluster-deploy-tool-26.1.0.tgz", "size": "16 KB"},
+        {"name": "mindcluster-crds-deploy-tool chart", "path": "helm-deploy-tool/output/mindcluster-crds-deploy-tool-26.1.0.tgz", "size": "164 KB"}
+      ]
+    },
+    "ut": {
+      "status": "成功",
+      "duration_seconds": 1000,
+      "summary": "12 个 Go 模块单元测试全部通过，共 221 个测试包(ok)，0 失败。使用 TZ=Asia/Shanghai、GOFLAGS=-gcflags=all=-l -mod=mod、timeout 1200s。",
+      "total_modules": 12,
+      "passed_modules": 12,
+      "failed_modules": 0,
+      "total_test_packages": 221,
+      "failed_test_packages": 0,
+      "modules": [
+        {"module": "ascend-common", "rc": 0, "ok_packages": 10, "failed": 0, "duration_seconds": 610},
+        {"module": "ascend-device-plugin", "rc": 0, "ok_packages": 14, "failed": 0, "duration_seconds": 29},
+        {"module": "ascend-docker-runtime", "rc": 0, "ok_packages": 8, "failed": 0, "duration_seconds": 3},
+        {"module": "ascend-operator", "rc": 0, "ok_packages": 10, "failed": 0, "duration_seconds": 13},
+        {"module": "clusterd", "rc": 0, "ok_packages": 53, "failed": 0, "duration_seconds": 81},
+        {"module": "container-manager", "rc": 0, "ok_packages": 9, "failed": 0, "duration_seconds": 5},
+        {"module": "infer-operator", "rc": 0, "ok_packages": 11, "failed": 0, "duration_seconds": 26},
+        {"module": "k8s-rdma-shared-dev-plugin", "rc": 0, "ok_packages": 5, "failed": 0, "duration_seconds": 18},
+        {"module": "noded", "rc": 0, "ok_packages": 27, "failed": 0, "duration_seconds": 42},
+        {"module": "npu-exporter", "rc": 0, "ok_packages": 9, "failed": 0, "duration_seconds": 74},
+        {"module": "ascend-faultdiag-online", "rc": 0, "ok_packages": 43, "failed": 0, "duration_seconds": 80},
+        {"module": "taskd", "rc": 0, "ok_packages": 22, "failed": 0, "duration_seconds": 17}
+      ]
+    },
+    "sample": {
+      "status": "成功",
+      "duration_seconds": 10,
+      "summary": "仓库无独立样例程序；对 6 个去重后的构建产出 wheel 执行 pip3 install --no-deps --force-reinstall 冒烟测试，全部 install_rc=0；额外 import mindio_ttp 成功。import mindio_acp 因运行时重依赖 torch 未安装报 ModuleNotFoundError，属预期（wheel 产物本身有效可安装）。",
+      "wheels_tested": 6,
+      "install_rc_all_zero": true,
+      "wheels": [
+        {"name": "mindio_acp-7.3.0-py3-none-linux_x86_64.whl", "install_rc": 0},
+        {"name": "mindio_ttp-7.3.0-py3-none-linux_x86_64.whl", "install_rc": 0, "import_check": "import mindio_ttp OK"},
+        {"name": "taskd-6.0.0-py3-none-linux_x86_64.whl", "install_rc": 0},
+        {"name": "alan_faultdiag-6.0.0-py3-none-linux_x86_64.whl", "install_rc": 0},
+        {"name": "ascend_faultdiag-6.0.0-py3-none-linux_x86_64.whl", "install_rc": 0},
+        {"name": "ascend_faultdiag_toolkit-6.0.0-py3-none-any.whl", "install_rc": 0}
+      ]
+    }
+  },
+  "documentation_gaps": [
+    {
+      "gap": "build/README.md 未记录 helm-deploy-tool 构建所需的 yq(mikefarah) 与 helm 命令行工具",
+      "impact": "在纯净 openEuler 环境按 README 装完依赖后，helm-deploy-tool 构建因缺 yq/helm 直接失败",
+      "evidence": "helm-deploy-tool/build/split_yaml.sh 第78行使用 yq eval，build.sh 使用 helm package；README 依赖清单无此两项",
+      "suggestion": "在 README 环境准备章节补充：go install github.com/mikefarah/yq/v4 与 helm.sh/helm/v3/cmd/helm（或对应二进制安装方式）"
+    },
+    {
+      "gap": "build/README.md 第114行声明 SWIG<4.2.0 时会“自动回退”生成非 abi3 wheel，但源码无回退分支",
+      "impact": "openEuler dnf 提供 SWIG 4.1.1，按 README 预期应能自动回退构建，实际因 CMakeLists 无条件启用 -DPy_LIMITED_API 导致编译报 PyTuple 宏未声明而失败",
+      "evidence": "component/mindio/acp/src/sdk/memfs/python_sdk/CMakeLists.txt 第14行 add_compile_options(-DPy_LIMITED_API=0x03070000) 无版本判断/回退分支",
+      "suggestion": "README 明确要求 SWIG>=4.2.0（如 pip 安装 4.3.x），或在 CMakeLists 中按 SWIG 版本条件启用 Py_LIMITED_API 以匹配文档所述回退逻辑"
+    },
+    {
+      "gap": "build/README.md openEuler 依赖清单缺少 zlib-devel",
+      "impact": "mindio ockiod 链接阶段需 -lz，缺 zlib-devel 会链接失败",
+      "evidence": "mindio 链接阶段 ld 报 -lz 未找到；README 系统依赖未列 zlib-devel",
+      "suggestion": "README openEuler 依赖清单补充 zlib-devel（映射自 Ubuntu libz-dev）"
+    },
+    {
+      "gap": "mindio tft build.sh 从 atomgit.com 拉取 libboundscheck，网络不稳定时超时",
+      "impact": "tft 构建中断（curl 56 Connection timed out）",
+      "evidence": "component/mindio/tft/build/build.sh 第85-90行 clone https://atomgit.com/openeuler/libboundscheck.git",
+      "suggestion": "README 提示可预先克隆/复用 acp 已下载的 3rdparty，或提供 gitcode/gitee 镜像地址作为备用源"
+    }
+  ],
+  "problems_encountered": [
+    {
+      "problem": "mindio 构建失败：SWIG 4.1.1 生成的 python_sdk 代码在 Py_LIMITED_API=0x03070000(abi3) 下报 'PyTuple_GET_SIZE'/'PyTuple_GET_ITEM' was not declared",
+      "root_cause": "SWIG <4.2.0 在 abi3 限制模式下仍使用被隐藏的 CPython 内部宏；CMakeLists.txt 无条件启用 -DPy_LIMITED_API",
+      "solution": "pip3 install \"swig>=4.2,<4.4\" 安装 SWIG 4.3.1（>=4.2 已修复），前置于 dnf 的 4.1.1，重建成功产出 cp37-abi3 wheel（不修改源码）",
+      "status": "已解决"
+    },
+    {
+      "problem": "mindio tft 从 atomgit.com clone libboundscheck 超时（curl 56 Recv failure: Connection timed out, rc=128）",
+      "root_cause": "atomgit.com 网络不稳定/超时",
+      "solution": "复制 acp 已成功 clone 的 libboundscheck(v1.1.16) 与 spdlog 到 tft/3rdparty 目录后重建 tft，规避网络拉取",
+      "status": "已解决"
+    },
+    {
+      "problem": "helm-deploy-tool 构建失败：缺少 yq 与 helm 命令",
+      "root_cause": "README 未记录此两项依赖，openEuler 基础环境不含",
+      "solution": "go install github.com/mikefarah/yq/v4@v4.44.3 与 helm.sh/helm/v3/cmd/helm@v3.15.4（GOBIN=/usr/local/bin）；helm 首次 goproxy.cn connection reset，重试续传成功",
+      "status": "已解决"
+    },
+    {
+      "problem": "从 github releases (objects.githubusercontent.com) wget 下载 yq/swig 二进制被拦截失败",
+      "root_cause": "github release 资源域名不可达",
+      "solution": "yq 改用 go install（goproxy.cn），swig 改用 pip（阿里云 PyPI 镜像）",
+      "status": "已解决"
+    },
+    {
+      "problem": "Go 1.26 工具链：dnf 仓库 golang 仅 1.21.4，不满足 go.mod 要求 1.26",
+      "root_cause": "openEuler 24.03 仓库 Go 版本过旧",
+      "solution": "手动 wget 安装官方 go1.26.4.linux-amd64；taskd 用 GOTOOLCHAIN=local 规避 go.mod toolchain 指令触发的工具链自动下载",
+      "status": "已解决"
+    }
+  ]
+}
