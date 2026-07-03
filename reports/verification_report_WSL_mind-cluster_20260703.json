@@ -480,27 +480,28 @@
       "gap": "build/README.md 未记录 helm-deploy-tool 构建所需的 yq(mikefarah) 与 helm 命令行工具",
       "impact": "在纯净 openEuler 环境按 README 装完依赖后，helm-deploy-tool 构建因缺 yq/helm 直接失败",
       "evidence": "helm-deploy-tool/build/split_yaml.sh 第78行使用 yq eval，build.sh 使用 helm package；README 依赖清单无此两项",
-      "suggestion": "在 README 环境准备章节补充：go install github.com/mikefarah/yq/v4 与 helm.sh/helm/v3/cmd/helm（或对应二进制安装方式）"
+      "suggestion": "在 README 环境准备章节补充：go install github.com/mikefarah/yq/v4 与 helm.sh/helm/v3/cmd/helm（或对应二进制安装方式）",
+      "fixed": true,
+      "fix_note": "已在 build/README.md 「openEuler从零构建环境准备」新增“## 4. helm-deploy-tool 打包依赖（yq、helm）”小节，给出 go install 安装 yq v4.44.3 与 helm v3.15.4 的命令；intro 亦补充 helm-deploy-tool"
     },
     {
       "gap": "build/README.md 第114行声明 SWIG<4.2.0 时会“自动回退”生成非 abi3 wheel，但源码无回退分支",
       "impact": "openEuler dnf 提供 SWIG 4.1.1，按 README 预期应能自动回退构建，实际因 CMakeLists 无条件启用 -DPy_LIMITED_API 导致编译报 PyTuple 宏未声明而失败",
       "evidence": "component/mindio/acp/src/sdk/memfs/python_sdk/CMakeLists.txt 第14行 add_compile_options(-DPy_LIMITED_API=0x03070000) 无版本判断/回退分支",
-      "suggestion": "README 明确要求 SWIG>=4.2.0（如 pip 安装 4.3.x），或在 CMakeLists 中按 SWIG 版本条件启用 Py_LIMITED_API 以匹配文档所述回退逻辑"
-    },
-    {
-      "gap": "build/README.md openEuler 依赖清单缺少 zlib-devel",
-      "impact": "mindio ockiod 链接阶段需 -lz，缺 zlib-devel 会链接失败",
-      "evidence": "mindio 链接阶段 ld 报 -lz 未找到；README 系统依赖未列 zlib-devel",
-      "suggestion": "README openEuler 依赖清单补充 zlib-devel（映射自 Ubuntu libz-dev）"
+      "suggestion": "README 明确要求 SWIG>=4.2.0（如 pip 安装 4.3.x）并去掉“自动回退”描述",
+      "fixed": true,
+      "fix_note": "已修改 build/README.md 第114行：去掉“自动回退”描述，改为明确要求 SWIG>=4.2.0，并补充 pip 安装方式与 PATH 优先级说明；openEuler 安装命令改用 pip 装 swig>=4.2"
     },
     {
       "gap": "mindio tft build.sh 从 atomgit.com 拉取 libboundscheck，网络不稳定时超时",
       "impact": "tft 构建中断（curl 56 Connection timed out）",
-      "evidence": "component/mindio/tft/build/build.sh 第85-90行 clone https://atomgit.com/openeuler/libboundscheck.git",
-      "suggestion": "README 提示可预先克隆/复用 acp 已下载的 3rdparty，或提供 gitcode/gitee 镜像地址作为备用源"
+      "evidence": "component/mindio/tft/build/build.sh 第85-90行 与 acp/build/build.sh 第103-108行 clone https://atomgit.com/openeuler/libboundscheck.git",
+      "suggestion": "README 提示可预先克隆/复用 acp 已下载的 3rdparty，或提供镜像地址作为备用源",
+      "fixed": true,
+      "fix_note": "已在 build/README.md 「自动拉取源码失败」章节新增第3条：说明 libboundscheck(v1.1.16) atomgit 拉取不稳定，给出复用 acp 已下载源码与预置镜像源两种规避方式"
     }
   ],
+  "documentation_gaps_note": "本轮初稿曾把“openEuler 依赖清单缺少 zlib-devel”列为缺口，经复核有误——zlib-devel 已记录在 build/README.md 第47行 dnf 安装列表及第51行注释中，故移除该假缺口。yq/helm 缺口亦已在本轮修复 build/README.md（新增“helm-deploy-tool 打包依赖”小节）。",
   "problems_encountered": [
     {
       "problem": "mindio 构建失败：SWIG 4.1.1 生成的 python_sdk 代码在 Py_LIMITED_API=0x03070000(abi3) 下报 'PyTuple_GET_SIZE'/'PyTuple_GET_ITEM' was not declared",
