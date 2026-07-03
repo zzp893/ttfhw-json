@@ -1,0 +1,270 @@
+# TTFHW Developer Scenario Repository List
+# Generated from TTFHW验证.xlsx sheet 自动任务 columns A-E
+
+"UBS Core":
+  description: "UBS Core 开发者场景验证代码仓列表"
+  repos:
+    - name: ubs-engine
+      url: "https://gitcode.com/openeuler/ubs-engine.git"
+      branch: master
+      component: "UBS Core"
+    - name: ubs-comm
+      url: "https://gitcode.com/openeuler/ubs-comm.git"
+      branch: br_BeiMing.26.0.RC1
+      component: "UBS Core"
+    - name: ubs-virt
+      url: "https://gitcode.com/openeuler/ubs-virt.git"
+      branch: master
+      component: "UBS Core"
+    - name: ubs-io
+      url: "https://gitcode.com/openeuler/ubs-io.git"
+      branch: master
+      component: "UBS Core"
+    - name: ubs-mem
+      url: "https://gitcode.com/openeuler/ubs-mem.git"
+      branch: master
+      component: "UBS Core"
+    - name: memfabric_hybrid
+      url: "https://gitcode.com/Ascend/memfabric_hybrid.git"
+      branch: master
+      component: "UBS Core"
+    - name: memcache
+      url: "https://gitcode.com/Ascend/memcache.git"
+      branch: master
+      component: "UBS Core"
+    - name: OmniStateStore
+      url: "https://gitcode.com/openeuler/OmniStateStore.git"
+      branch: master
+      component: BoostKit
+    - name: ham
+      url: "https://gitcode.com/openeuler/ham.git"
+      branch: master
+      component: "UB OS Compent"
+    - name: ubturbo
+      url: "https://gitcode.com/openeuler/ubturbo.git"
+      branch: master
+      component: "UB OS Compent"
+
+OpenUBMC:
+  description: "OpenUBMC 开发者场景验证代码仓列表"
+  repos:
+    - name: libmcpp
+      url: "https://gitcode.com/openUBMC/libmcpp.git"
+      branch: main
+      component: OpenUBMC
+    - name: devmon
+      url: "https://gitcode.com/openUBMC/devmon.git"
+      branch: main
+      component: OpenUBMC
+    - name: libipmi
+      url: "https://gitcode.com/openUBMC/libipmi.git"
+      branch: main
+      component: OpenUBMC
+    - name: component_drivers
+      url: "https://gitcode.com/openUBMC/component_drivers.git"
+      branch: main
+      component: OpenUBMC
+    - name: webui
+      url: "https://gitcode.com/openUBMC/webui.git"
+      branch: main
+      component: OpenUBMC
+
+HPCKit:
+  description: "HPCKit 开发者场景验证代码仓列表"
+  repos:
+    - name: kupl
+      url: "https://gitcode.com/kunpengcompute/kupl.git"
+      branch: main
+      component: HPCKit
+    - name: kutacc
+      url: "https://gitcode.com/kunpengcompute/kutacc.git"
+      branch: main
+      component: HPCKit
+    - name: kudnn
+      url: "https://gitcode.com/kunpengcompute/kudnn.git"
+      branch: main
+      component: HPCKit
+    - name: kuqcd
+      url: "https://gitcode.com/kunpengcompute/kuqcd.git"
+      branch: main
+      component: HPCKit
+    - name: hmpi
+      url: "https://gitcode.com/kunpengcompute/hmpi.git"
+      branch: v26.1.x
+      component: HPCKit
+    - name: hucx
+      url: "https://gitcode.com/kunpengcompute/hucx.git"
+      branch: v26.1.x
+      component: HPCKit
+    - name: xucg
+      url: "https://gitcode.com/kunpengcompute/xucg.git"
+      branch: v26.1.x
+      component: HPCKit
+    - name: kpex
+      url: "https://gitcode.com/kunpengcompute/kunpeng-extension-for-pytorch.git"
+      branch: main
+      component: HPCKit
+
+MindIE:
+  description: "MindIE 开发者场景验证代码仓列表"
+  repos:
+    - name: MindIE-LLM
+      url: "https://gitcode.com/Ascend/MindIE-LLM.git"
+      branch: master
+      component: MindIE
+    - name: MindIE-Motor
+      url: "https://gitcode.com/Ascend/MindIE-Motor.git"
+      branch: master
+      component: MindIE
+    - name: MindIE-SD
+      url: "https://gitcode.com/Ascend/MindIE-SD.git"
+      branch: master
+      component: MindIE
+    - name: PyMotor
+      url: "https://gitcode.com/Ascend/MindIE-PyMotor.git"
+      branch: master
+      component: MindIE
+
+MindSpeed:
+  description: "MindSpeed 开发者场景验证代码仓列表"
+  repos:
+    - name: Mindspeed
+      url: "https://gitcode.com/Ascend/MindSpeed.git"
+      branch: master
+      component: MindSpeed
+    - name: Mindspeed-llm
+      url: "https://gitcode.com/Ascend/MindSpeed-LLM.git"
+      branch: master
+      component: MindSpeed
+    - name: Mindspeed-mm
+      url: "https://gitcode.com/Ascend/MindSpeed-MM.git"
+      branch: master
+      component: MindSpeed
+
+PTA:
+  description: "PTA 开发者场景验证代码仓列表"
+  repos:
+    - name: Ascend/pytorch
+      url: "https://gitcode.com/Ascend/pytorch.git"
+      branch: v2.7.1
+      component: PTA
+    - name: Ascend/op-plugin
+      url: "https://gitcode.com/Ascend/op-plugin.git"
+      branch: v2.7.1
+      component: PTA
+    - name: Ascend/torchair
+      url: "https://gitcode.com/Ascend/torchair.git"
+      branch: master
+      component: PTA
+
+OpenEuler:
+  description: "OpenEuler 开发者场景验证代码仓列表"
+  repos:
+    - name: Kernel
+      url: "https://gitcode.com/openeuler/kernel.git"
+      branch: OLK-6.6
+      component: OpenEuler
+    - name: isula
+      url: "https://gitcode.com/openeuler/iSulad.git"
+      branch: master
+      component: OpenEuler
+    - name: A-Tune
+      url: "https://gitcode.com/openeuler/A-Tune.git"
+      branch: master
+      component: OpenEuler
+    - name: stratovirt
+      url: "https://gitcode.com/openeuler/stratovirt.git"
+      branch: master
+      component: OpenEuler
+    - name: bishengjdk-8
+      url: "https://gitcode.com/openeuler/bishengjdk-8.git"
+      branch: master
+      component: OpenEuler
+
+CANN:
+  description: "CANN 开发者场景验证代码仓列表"
+  repos:
+    - name: ops-nn
+      url: "https://gitcode.com/cann/ops-nn.git"
+      branch: master
+      component: "算子库"
+    - name: ops-math
+      url: "https://gitcode.com/cann/ops-math.git"
+      branch: master
+      component: "算子库"
+    - name: ops-transformer
+      url: "https://gitcode.com/cann/ops-transformer.git"
+      branch: master
+      component: "算子库"
+    - name: ops-cv
+      url: "https://gitcode.com/cann/ops-cv.git"
+      branch: master
+      component: "算子库"
+    - name: opbase
+      url: "https://gitcode.com/cann/opbase.git"
+      branch: master
+      component: "算子库"
+    - name: hixl
+      url: "https://gitcode.com/cann/hixl.git"
+      branch: master
+      component: "通信库"
+    - name: shmem
+      url: "https://gitcode.com/cann/shmem.git"
+      branch: master
+      component: "通信库"
+    - name: hccl
+      url: "https://gitcode.com/cann/hccl.git"
+      branch: master
+      component: "通信库"
+    - name: hcomm
+      url: "https://gitcode.com/cann/hcomm.git"
+      branch: master
+      component: "通信库"
+    - name: metadef
+      url: "https://gitcode.com/cann/metadef.git"
+      branch: master
+      component: "图引擎"
+    - name: graph-autofusion
+      url: "https://gitcode.com/cann/graph-autofusion.git"
+      branch: master
+      component: "图引擎"
+    - name: asc-devkit
+      url: "https://gitcode.com/cann/asc-devkit.git"
+      branch: master
+      component: "编程语言"
+    - name: asc-tools
+      url: "https://gitcode.com/cann/asc-tools.git"
+      branch: master
+      component: "编程语言"
+    - name: pto-isa
+      url: "https://gitcode.com/cann/pto-isa"
+      branch: master
+      component: "编程语言"
+    - name: pyasc
+      url: "https://gitcode.com/cann/pyasc.git"
+      branch: master
+      component: "编程语言"
+    - name: pypto
+      url: "https://gitcode.com/cann/pypto.git"
+      branch: master
+      component: "编程语言"
+    - name: atvoss
+      url: "https://gitcode.com/cann/atvoss.git"
+      branch: master
+      component: "编程语言"
+    - name: runtime
+      url: "https://gitcode.com/cann/runtime.git"
+      branch: master
+      component: "运行时"
+    - name: driver
+      url: "https://gitcode.com/cann/driver.git"
+      branch: master
+      component: "驱动"
+    - name: oam-tools
+      url: "https://gitcode.com/cann/oam-tools.git"
+      branch: master
+      component: "工具"
+    - name: amct
+      url: "https://gitcode.com/cann/amct.git"
+      branch: master
+      component: "工具"
