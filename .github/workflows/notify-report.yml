@@ -15,6 +15,6 @@ jobs:
           curl -s -X POST \
             -H "Authorization: token ${{ secrets.TTFHW_REPORT_TOKEN }}" \
             -H "Accept: application/vnd.github.everest-preview+json" \
-            https://api.github.com/repos/kerer-ai/ttfhw-report/dispatches \
+            https://api.github.com/repos/computing-TTFHW/report/dispatches \
             -d '{"event_type":"new-reports"}' \
             -w "\nHTTP %{http_code}" | tail -1
