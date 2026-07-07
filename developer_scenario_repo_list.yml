@@ -108,13 +108,9 @@ HPCKit:
 MindIE:
   description: "MindIE 开发者场景验证代码仓列表"
   repos:
-    - name: MindIE-LLM
-      url: "https://gitcode.com/Ascend/MindIE-LLM.git"
-      branch: master
-      component: MindIE
-    - name: MindIE-Motor
-      url: "https://gitcode.com/Ascend/MindIE-Motor.git"
-      branch: master
+    - name: vllm-ascend
+      url: "https://github.com/vllm-project/vllm-ascend.git"
+      branch: main
       component: MindIE
     - name: MindIE-SD
       url: "https://gitcode.com/Ascend/MindIE-SD.git"
